@@ -958,7 +958,7 @@ class WS2812FX {
     inline uint32_t getPixelColorNoMap(unsigned n) const { return (n < getLengthTotal()) ? _pixels[n] : 0; } // ignores mapping table
     inline uint32_t getLastShow() const             { return _lastShow; }                 // returns millis() timestamp of last strip.show() call
 
-    const char *getModeData(unsigned id = 0) const  { return (id && id < _modeCount) ? _modeData[id] : PSTR("Solid"); }
+    const char *getModeData(unsigned id = 0) const  { return (id && id < _modeCount) ? _modeData[id] : PSTR("Solid@;!;"); }
     inline const char **getModeDataSrc()            { return &(_modeData[0]); }           // vectors use arrays for underlying data
 
     Segment&        getSegment(unsigned id);

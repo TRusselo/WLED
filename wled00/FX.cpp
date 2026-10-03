@@ -136,7 +136,7 @@ static um_data_t* getAudioData() {
 void mode_static(void) {
   SEGMENT.fill(SEGCOLOR(0));
 }
-static const char _data_FX_MODE_STATIC[] PROGMEM = "Solid";
+static const char _data_FX_MODE_STATIC[] PROGMEM = "Solid@;!;";
 
 /*
  * Copy a segment and perform (optional) color adjustments
@@ -1451,7 +1451,7 @@ void mode_two_dots() {
     SEGMENT.setPixelColor(indexB, color2);
   }
 }
-static const char _data_FX_MODE_TWO_DOTS[] PROGMEM = "Two Dots@!,Dot size,,,,,Overlay;1,2,Bg;!";
+static const char _data_FX_MODE_TWO_DOTS[] PROGMEM = "Two Dots@!,Dot size,,,,,Overlay;1,2,Bg;";
 
 
 /*
@@ -1900,7 +1900,7 @@ void mode_oscillate(void) {
 
   SEGENV.step = it;
 }
-static const char _data_FX_MODE_OSCILLATE[] PROGMEM = "Oscillate";
+static const char _data_FX_MODE_OSCILLATE[] PROGMEM = "Oscillate@!,!;1,2,3;";
 
 
 void mode_lightning(void) {
@@ -2701,14 +2701,14 @@ void mode_twinklefox()
 {
   twinklefox_base(false);
 }
-static const char _data_FX_MODE_TWINKLEFOX[] PROGMEM = "Twinklefox@!,Twinkle rate,,,,Cool;!,!;!";
+static const char _data_FX_MODE_TWINKLEFOX[] PROGMEM = "Twinklefox@!,Twinkle rate,,,,Cool;,!;!";
 
 
 void mode_twinklecat()
 {
   twinklefox_base(true);
 }
-static const char _data_FX_MODE_TWINKLECAT[] PROGMEM = "Twinklecat@!,Twinkle rate,,,,Cool,Reverse;!,!;!";
+static const char _data_FX_MODE_TWINKLECAT[] PROGMEM = "Twinklecat@!,Twinkle rate,,,,Cool,Reverse;,!;!";
 
 
 void mode_halloween_eyes()
@@ -3327,7 +3327,7 @@ static void mode_pacman(void) {
 
   SEGMENT.blur(SEGMENT.custom2>>1);
 }
-static const char _data_FX_MODE_PACMAN[] PROGMEM = "PacMan@Speed,# of PowerDots,Blink distance,Blur,# of Ghosts,Dots,Smear,Compact;;!;1;m12=0,sx=192,ix=64,c1=64,c2=0,c3=12,o1=1,o2=0";
+static const char _data_FX_MODE_PACMAN[] PROGMEM = "PacMan@Speed,# of PowerDots,Blink distance,Blur,# of Ghosts,Dots,Smear,Compact;;;1;m12=0,sx=192,ix=64,c1=64,c2=0,c3=12,o1=1,o2=0";
 
 
 /*
@@ -3942,7 +3942,7 @@ void mode_drip(void)
   for (unsigned stripNr=0; stripNr<strips; stripNr++)
     virtualStrip::runStrip(stripNr, &drops[stripNr*maxNumDrops]);
 }
-static const char _data_FX_MODE_DRIP[] PROGMEM = "Drip@Gravity,# of drips,,,,,Overlay;!,!;!;;m12=1"; //bar
+static const char _data_FX_MODE_DRIP[] PROGMEM = "Drip@Gravity,# of drips,,,,,Overlay;!,!;;;m12=1"; //bar
 
 /*
  * Tetris or Stacking (falling bricks) Effect
@@ -4615,7 +4615,7 @@ void mode_dancing_shadows(void)
     }
   }
 }
-static const char _data_FX_MODE_DANCING_SHADOWS[] PROGMEM = "Dancing Shadows@!,# of shadows;!;!";
+static const char _data_FX_MODE_DANCING_SHADOWS[] PROGMEM = "Dancing Shadows@!,# of shadows;;!";
 #endif // WLED_PS_DONT_REPLACE_1D_FX
 
 /*
@@ -4802,7 +4802,7 @@ void mode_tv_simulator(void) {
     SEGENV.aux0 = 0;
   }
 }
-static const char _data_FX_MODE_TV_SIMULATOR[] PROGMEM = "TV Simulator@!,!;;!;01";
+static const char _data_FX_MODE_TV_SIMULATOR[] PROGMEM = "TV Simulator@!,!;;;01";
 
 
 /*
@@ -5150,7 +5150,7 @@ void mode_shimmer() {
     }
   }
 }
-static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size,Granular,Flow,Zebra,Reverse,Sporadic;Fx,Bg,Cx;!;1;pal=15,sx=220,ix=10,c2=0,c3=0";
+static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size,Granular,Flow,Zebra,Reverse,Sporadic;Fx,Bg;!;1;pal=15,sx=220,ix=10,c2=0,c3=0";
 
 #ifndef WLED_DISABLE_2D
 ///////////////////////////////////////////////////////////////////////////////
@@ -6714,7 +6714,7 @@ void mode_ripplepeak(void) {                // * Ripple peak. By Andrew Tuline.
     } // switch step
   } // for i
 } // mode_ripplepeak()
-static const char _data_FX_MODE_RIPPLEPEAK[] PROGMEM = "Ripple Peak@Fade rate,Max # of ripples,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0"; // Pixel, Beatsin
+static const char _data_FX_MODE_RIPPLEPEAK[] PROGMEM = "Ripple Peak@,Max # of ripples,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0"; // Pixel, Beatsin
 
 
 #ifndef WLED_DISABLE_2D
@@ -6752,7 +6752,7 @@ void mode_2DSwirl(void) {
   SEGMENT.addPixelColorXY( i,nj, ColorFromPalette(SEGPALETTE, (strip.now / 37 + volumeSmth*4), volumeRaw * SEGMENT.intensity / 64, LINEARBLEND)); //CHSV( ms / 37, 200, 255);
   SEGMENT.addPixelColorXY(ni, j, ColorFromPalette(SEGPALETTE, (strip.now / 41 + volumeSmth*4), volumeRaw * SEGMENT.intensity / 64, LINEARBLEND)); //CHSV( ms / 41, 200, 255);
 } // mode_2DSwirl()
-static const char _data_FX_MODE_2DSWIRL[] PROGMEM = "Swirl@!,Sensitivity,Blur;,Bg Swirl;!;2v;ix=64,si=0"; // Beatsin // TODO: color 1 unused?
+static const char _data_FX_MODE_2DSWIRL[] PROGMEM = "Swirl@!,Sensitivity,Blur;;!;2v;ix=64,si=0"; // Beatsin
 
 
 /////////////////////////
@@ -6787,7 +6787,7 @@ void mode_2DWaverly(void) {
   }
   if (SEGMENT.check3) SEGMENT.blur(16, cols*rows < 100);
 } // mode_2DWaverly()
-static const char _data_FX_MODE_2DWAVERLY[] PROGMEM = "Waverly@Amplification,Sensitivity,,,,,Blur;;!;2v;ix=64,si=0"; // Beatsin
+static const char _data_FX_MODE_2DWAVERLY[] PROGMEM = "Waverly@Amplification,Sensitivity,,,,,,Blur;;!;2v;ix=64,si=0"; // Beatsin
 
 #endif // WLED_DISABLE_2D
 
@@ -7985,7 +7985,7 @@ void mode_2Doctopus() {
     }
   }
 }
-static const char _data_FX_MODE_2DOCTOPUS[] PROGMEM = "Octopus@!,,Offset X,Offset Y,Legs,fasttan;;!;2;";
+static const char _data_FX_MODE_2DOCTOPUS[] PROGMEM = "Octopus@!,,Offset X,Offset Y,Legs;;!;2;";
 
 
 //Waving Cell
