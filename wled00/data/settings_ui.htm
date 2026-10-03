@@ -6,7 +6,7 @@
 	<title>UI Settings</title>
 	<style> html { visibility: hidden; } </style> <!-- prevent white & ugly display while loading, unhidden in loadResources() -->
 	<script>
-	var initial_ds, initial_st, oldUrl;
+	var initial_ds, initial_st, initial_su, oldUrl;
 	var sett = null;
 	// load common.js with retry on error
 	(function loadFiles() {
@@ -163,7 +163,7 @@
 	
 	function Save() {
 		SetLS();
-		if (d.Sf.DS.value != initial_ds /*|| d.Sf.ST.checked != initial_st*/) d.Sf.submit();
+		if (d.Sf.DS.value != initial_ds || /*d.Sf.ST.checked != initial_st ||*/ d.Sf.SU.checked != initial_su) d.Sf.submit();
 	}
 	
 	function S() {
@@ -171,6 +171,7 @@
 		loadJS(getURL('/settings/s.js?p=3'), false, undefined, ()=>{
 			initial_ds = d.Sf.DS.value;
 			//initial_st = d.Sf.ST.checked;
+			initial_su = d.Sf.SU.checked;
 			GetLS();
 		});	// If we set async false, file is loaded and executed, then next statement is processed
 		if (loc) d.Sf.action = getURL('/settings/ui');
@@ -227,6 +228,7 @@
 	<h2>User Interface</h2>
 	<div class="sec">
 		Device Name: <input type="text" name="DS" maxlength="32"><br>
+		Enable simplified UI (single column on all screens): <input type="checkbox" name="SU"><br>
 	</div>
   <div class="sec">
 		<i>The following UI customization settings are unique both to the WLED device and this browser.<br>

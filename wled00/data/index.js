@@ -12,7 +12,7 @@ var cpick; // iro color picker
 var currentPreset = -1;
 var lastUpdate = 0;
 var segCount = 0, ledCount = 0, lowestUnused = 0, maxSeg = 0, lSeg = 0;
-var wW;
+var wW, wide = false; // window width, multi-column layout
 var tr = 7;
 var d = document;
 const ranges = RangeTouch.setup('input[type="range"]', {});
@@ -629,6 +629,7 @@ function populatePresets(fromls)
 
 function parseInfo(i) {
 	lastinfo = i;
+	size(); // the layout depends on the Simplified UI setting
 	var name = i.name;
 	gId('namelabel').innerHTML = name;
 	if (!name.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u3131-\uD79D]/))
@@ -3028,7 +3029,7 @@ function hasIroClass(classList)
 //required by rangetouch.js
 function lock(e)
 {
-	if (wW >= 1024) return; // no swiping in multi-column layout
+	if (wide) return; // no swiping in multi-column layout
 	var l = e.target.classList;
 	var pl = e.target.parentElement.classList;
 
@@ -3065,12 +3066,14 @@ function move(e)
 function size()
 {
 	wW = window.innerWidth;
+	wide = wW >= 1024 && !lastinfo.simplifiedui; // Simplified UI keeps the single-column layout on wide screens
+	d.documentElement.classList.toggle('wide', wide);
 	var h = gId('top').clientHeight;
 	sCol('--th', `calc(${h}px + var(--dbh))`); // top bar starts below the development build banner
 	sCol('--bh', gId('bot').clientHeight + "px");
 	if (isLv) h -= 4;
 	sCol('--tp', `calc(${h}px + var(--dbh))`);
-	if (cpick) cpick.resize(wW>1023 && wW<1250 ? 230 : 260); // narrower wheel for 4 columns on tablets
+	if (cpick) cpick.resize(wide && wW<1250 ? 230 : 260); // narrower wheel for 4 columns on tablets
 }
 
 function mergeDeep(target, ...sources)
