@@ -403,11 +403,6 @@ button {
 	padding: 5px 0 0;
 }
 
-/* Quick load magin for simplified UI */
-.simplified #pql, .simplified #palw, .simplified #fx {
-	margin-bottom: 8px;
-}
-
 .smooth { transition: transform	calc(var(--f, 1)*.5s) ease-out }
 
 .tab-label {
@@ -801,10 +796,6 @@ input[type=range]::-moz-range-thumb {
 /* Dynamically hide labels */
 .hd {
 	display: var(--bhd);
-}
-/* Do not hide quick load label in simplified mode on small screen widths */
-.simplified #pql .hd {
-	display: var(--bhd) !important;
 }
 
 #briwrap {
@@ -1335,12 +1326,6 @@ TD .checkmark, TD .radiomark {
 	margin-top: 4px;
 }
 
-/* Simplify segments */
-.simplified #segcont .lstI {
-	margin-top: 4px;
-	min-height: unset;
-}
-
 /* selected item/element */
 .selected { /* has to be after .lstI since !important is not ok */
 	background: var(--c-4);
@@ -1559,9 +1544,6 @@ dialog {
 		width: 8%;
 		padding: 10px 0 8px 0;
 	}
-	#buttonPcm {
-		display: none;
-	}
 }
 
 @media all and (max-width: 335px) {
@@ -1616,7 +1598,18 @@ dialog {
 	}
 }
 
-/* small screen & tablet "PC mode" support */
+/* wide screens: all tabs side by side, no tab bar */
+@media all and (min-width: 1024px) {
+	.container {
+		width: 100%;
+		transform: none;
+	}
+	.bot {
+		display: none;
+	}
+}
+
+/* small screen & tablet multi-column support */
 @media all and (min-width: 1024px) and (max-width: 1249px) {
 	#segutil, #segutil2, #segcont, #putil, #pcont, #pql, #fx, #palw, #psFind, #sliders {
 		width: 100%;

@@ -57,7 +57,6 @@ bool deserializeConfig(JsonObject doc, bool fromFS) {
 #ifndef WLED_DISABLE_ALEXA
   getStringFromJson(alexaInvocationName, id[F("inv")], 33);
 #endif
-  CJSON(simplifiedUI, id[F("sui")]);
 
   JsonObject nw = doc["nw"];
 #ifndef WLED_DISABLE_ESPNOW
@@ -861,7 +860,6 @@ void serializeConfig(JsonObject root) {
 #ifndef WLED_DISABLE_ALEXA
   id[F("inv")] = alexaInvocationName;
 #endif
-  id[F("sui")] = simplifiedUI;
 
   JsonObject nw = root.createNestedObject("nw");
 #ifndef WLED_DISABLE_ESPNOW
