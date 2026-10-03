@@ -1363,14 +1363,12 @@ function updateSelectedFx()
 	if (selEffectInput) selEffectInput.checked = true;
 
 	var selElement = parent.querySelector('.selected');
-	if (selElement) {
-		selElement.classList.remove('selected');
-		selElement.style.bottom = null; // remove element style added in slider handling
-	}
+	if (selElement) selElement.classList.remove('selected');
 
 	var selectedEffect = parent.querySelector(`.lstI[data-id="${selectedFx}"]`);
 	if (selectedEffect) {
 		selectedEffect.classList.add('selected');
+		if (selElement !== selectedEffect) selectedEffect.scrollIntoView({block: 'nearest'}); // keep a newly selected effect visible in the open list
 		setEffectParameters(selectedFx);
 		// hide non-0D effects if segment only has 1 pixel (0D)
 		parent.querySelectorAll('.lstI').forEach((fx)=>{
@@ -3072,6 +3070,7 @@ function size()
 	sCol('--bh', gId('bot').clientHeight + "px");
 	if (isLv) h -= 4;
 	sCol('--tp', `calc(${h}px + var(--dbh))`);
+	if (cpick) cpick.resize(wW>1023 && wW<1250 ? 230 : 260); // narrower wheel for 4 columns on tablets
 }
 
 function mergeDeep(target, ...sources)
