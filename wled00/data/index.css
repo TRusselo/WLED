@@ -1469,6 +1469,7 @@ dialog {
 /* lists inside dialogs scroll normally (no sticky items) */
 dialog .lstI {
 	position: relative;
+	z-index: 0; /* keeps the palette preview (z-index: -1) above the item background, as sticky did */
 	top: 0 !important;
 	bottom: 0 !important;
 }
