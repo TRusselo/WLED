@@ -1405,6 +1405,7 @@ function updateSelectedPalette(s)
 	} else {
 		for (let i of cd) if (i.dataset.hide == '1') i.classList.add('hide');
 	}
+	for (let i = 0; i < 3; i++) if (pcol >> i & 1) cd[i].classList.remove('hide'); // also colors the firmware sees the effect use (e.g. Colorful at high saturation)
 	updColSrc();
 }
 

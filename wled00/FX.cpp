@@ -1007,7 +1007,7 @@ static const char _data_FX_MODE_CHASE_RAINBOW_WHITE[] PROGMEM = "Rainbow Runner@
  * Red - Amber - Green - Blue lights running
  */
 void mode_colorful(void) {
-  if (SEGMENT.intensity > 160) SEGMENT.addPaletteColors(0b111); // a palette replaces the 3 colors (used only at high saturation)
+  SEGMENT.setPaletteColors(SEGMENT.intensity > 160 ? 0b111 : 0); // the 3 colors are used (and replaced by a palette) only at high saturation
   unsigned numColors = 4; //3, 4, or 5
   uint32_t cols[9]{0x00FF0000,0x00EEBB00,0x0000EE00,0x000077CC};
   if (SEGMENT.intensity > 160 || SEGMENT.palette) { //palette or color
@@ -1044,7 +1044,7 @@ void mode_colorful(void) {
     for (unsigned j = 0; j < numColors; j++) SEGMENT.setPixelColor(i + j, cols[SEGENV.aux0 + j]);
   }
 }
-static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Pastel / Classic / My colors;1,2,3;!";
+static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Pastel / Classic / My colors;;!";
 
 
 /*
@@ -5165,6 +5165,7 @@ static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size
 // Black hole
 void mode_2DBlackHole(void) {            // By: Stepko https://editor.soulmatelights.com/gallery/1012 , Modified by: Andrew Tuline
   if (!strip.isMatrix || !SEGMENT.is2D()) FX_FALLBACK_STATIC; // not a 2D set-up
+  SEGMENT.setPaletteColors(SEGMENT.check1); // the main color is used (and replaced by a palette) only with "Solid"
 
   const int cols = SEG_W;
   const int rows = SEG_H;
@@ -5189,7 +5190,7 @@ void mode_2DBlackHole(void) {            // By: Stepko https://editor.soulmateli
   // blur everything a bit
   if (SEGMENT.check3) SEGMENT.blur(16, cols*rows < 100);
 } // mode_2DBlackHole()
-static const char _data_FX_MODE_2DBLACKHOLE[] PROGMEM = "Black Hole@Fade rate,Outer Y freq.,Outer X freq.,Inner X freq.,Inner Y freq.,Solid,,Blur;!;!;2;pal=11";
+static const char _data_FX_MODE_2DBLACKHOLE[] PROGMEM = "Black Hole@Fade rate,Outer Y freq.,Outer X freq.,Inner X freq.,Inner Y freq.,Solid,,Blur;;!;2;pal=11";
 
 
 ////////////////////////////

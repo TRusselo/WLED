@@ -543,7 +543,7 @@ class Segment {
     inline uint32_t getPixelColorXYRaw(unsigned x, unsigned y) const              { auto XY = [](unsigned X, unsigned Y){ return X + Y*Segment::vWidth(); }; return pixels[XY(x,y)]; };
   #endif
     void resetIfRequired();         // sets all SEGENV variables to 0 and clears data buffer
-    void newPaletteColors(uint8_t slots) const; // see addPaletteColors()
+    void updatePaletteColors(uint8_t v) const; // stores a new _palColors value, see addPaletteColors()
 
     // transition functions
     void stopTransition();                  // ends transition mode by destroying transition structure (does nothing if not in transition)
@@ -650,7 +650,8 @@ class Segment {
     inline uint8_t  getLightCapabilities() const { return _capabilities; }
     inline uint8_t  getPaletteColors()     const { return _palColors; }    // color slots the effect draws through the palette (bit mask) and PALCOL_DEFAULT_* flags, see color_from_palette()
     const CRGBPalette16 &effectPalette() const; // SEGPALETTE (not inline: used in many effects)
-    inline void     addPaletteColors(uint8_t slots) const { if (slots & ~_palColors) newPaletteColors(slots); } // for effects that choose between palette and color slots by themselves
+    inline void     addPaletteColors(uint8_t slots) const { if (slots & ~_palColors) updatePaletteColors(_palColors | slots); } // for effects that choose between palette and color slots by themselves
+    inline void     setPaletteColors(uint8_t slots) const { slots = (slots & 0x07) | (_palColors & ~0x07); if (slots != _palColors) updatePaletteColors(slots); } // same, also removes slots the effect no longer uses (e.g. depending on a slider)
     inline void     deactivate()                 { setGeometry(0,0); }
     inline Segment &clearName()                  { p_free(name); name = nullptr; return *this; }
     inline Segment &setName(const String &name)  { return setName(name.c_str()); }
