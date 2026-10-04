@@ -1044,7 +1044,7 @@ void mode_colorful(void) {
     for (unsigned j = 0; j < numColors; j++) SEGMENT.setPixelColor(i + j, cols[SEGENV.aux0 + j]);
   }
 }
-static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Saturation;1,2,3;!";
+static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Pastel / Classic / My colors;1,2,3;!";
 
 
 /*
@@ -2472,7 +2472,7 @@ void mode_railway() {
   }
   SEGENV.step += FRAMETIME;
 }
-static const char _data_FX_MODE_RAILWAY[] PROGMEM = "Railway@!,Smoothness;1,2;!;;pal=3";
+static const char _data_FX_MODE_RAILWAY[] PROGMEM = "Railway@!,Smoothness;;!;;pal=3";
 
 
 //Water ripple

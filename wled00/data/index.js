@@ -5,7 +5,7 @@ var hasWhite = false, hasRGB = false, hasCCT = false, has2D = false;
 var nlDur = 60, nlTar = 0;
 var nlMode = false;
 var segLmax = 0; // size (in pixels) of largest selected segment
-var pcol = 0, fxPal = false, lastPal = 0; // pcol: color slots the effect draws through the palette (bit mask, "pcol" of the segment state), fxPal: the effect uses the palette, lastPal: palette for the "Palette" switch
+var pcol = 0, fxPal = false, lastPal = 0, defPal = 6; // pcol: color slots the effect draws through the palette (bit mask, "pcol" of the segment state), fxPal: the effect uses the palette, lastPal: palette for the "Palette" switch, defPal: what "Default" means for the effect
 var selectedFx = 0;
 var selectedPal = 0;
 var csel = 0; // selected color slot (0-2)
@@ -1384,11 +1384,12 @@ function updateSelectedPalette(s)
 	pb.innerText = selectedPalette.querySelector(".lstIname").innerText;
 
 	// in case of special palettes (* Colors...), force show color selectors (if hidden by effect data)
-	let cd = gId('csl').children; // color selectors
-	if (s > 1 && s < 6) {
+	// "Default" is the effect's own palette, which may be one of them (Railway, Slow Transition)
+	let cd = gId('csl').children, e = s || defPal; // color selectors, palette in use
+	if (e > 1 && e < 6) {
 		cd[0].classList.remove('hide'); // * Color 1
-		if (s > 2) cd[1].classList.remove('hide'); // * Color 1 & 2
-		if (s > 3) cd[2].classList.remove('hide'); // all colors
+		if (e > 2) cd[1].classList.remove('hide'); // * Color 1 & 2
+		if (e > 3) cd[2].classList.remove('hide'); // all colors
 	} else {
 		for (let i of cd) if (i.dataset.hide == '1') i.classList.add('hide');
 	}
@@ -1732,6 +1733,7 @@ function setEffectParameters(idx)
 	let pl = pu && paOnOff.length ? paOnOff[0].split("=")[0] : "!";
 	gId("pall").innerText = pl == "!" ? "Palette" : pl;
 	fxPal = pu;
+	defPal = +(/pal=(\d+)/.exec(effectPars[4]) || [])[1] || 6; // the effect's own palette for "Default", as in Segment::setMode()
 	updColSrc();
 	if (!pu) gId("paldlg").close();
 	// AI: end
