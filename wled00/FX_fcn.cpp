@@ -1170,6 +1170,12 @@ void Segment::newPaletteColors(uint8_t slots) const {
   _palColors |= slots;
   if (interfaceUpdateCallMode == CALL_MODE_INIT) interfaceUpdateCallMode = CALL_MODE_WS_SEND; // sent by updateInterfaces() after its cooldown
 }
+
+// SEGPALETTE: the palette for the current effect; with the Default palette this is the effect's own palette, which the UI names (PALCOL_DEFAULT_PALETTE)
+const CRGBPalette16 &Segment::effectPalette() const {
+  if (!palette) addPaletteColors(PALCOL_DEFAULT_PALETTE);
+  return _currentPalette;
+}
 // AI: end
 
 /*
@@ -1198,7 +1204,8 @@ uint32_t Segment::color_wheel(uint8_t pos) const {
  * @returns Single color from palette
  */
 uint32_t Segment::color_from_palette(uint16_t i, bool mapping, bool moving, uint8_t mcol, uint8_t pbri) const {
-  if (mcol < NUM_COLORS) addPaletteColors(1U << mcol); // remember the color slots this effect draws through the palette
+  if (mcol < NUM_COLORS) addPaletteColors(1U << mcol);                // remember the color slots this effect draws through the palette
+  else if (!palette)     addPaletteColors(PALCOL_DEFAULT_PALETTE);    // "Default" shows the effect's own palette
   uint32_t color = getCurrentColor(mcol);
   // default palette or no RGB support on segment
   if ((palette == 0 && mcol < NUM_COLORS) || !_isRGB) {
@@ -1383,6 +1390,7 @@ void WS2812FX::service() {
         _currentSegment = &seg;             // set current segment for effect functions (SEGMENT & SEGENV)
         // workaround for on/off transition to respect blending style
         _mode[seg.mode]();                  // run new/current mode (needed for bri workaround)
+        if (!seg.palette) seg.addPaletteColors(PALCOL_DEFAULT_SEEN); // the UI can now tell what "Default" shows for this effect
         seg.call++;
         // if segment is in transition and no old segment exists we don't need to run the old mode
         // (blendSegments() takes care of On/Off transitions and clipping)

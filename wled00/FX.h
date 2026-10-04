@@ -105,10 +105,13 @@ extern byte realtimeMode;           // used in getMappedPixelIndex()
 #define MIN_SHOW_DELAY   (_frametime < 16 ? 8 : 15)
 
 #define NUM_COLORS       3 /* number of colors per segment */
+// Segment::getPaletteColors() ("pcol" in the segment state): bits 0-2 are the color slots the effect draws through the palette, and
+#define PALCOL_DEFAULT_PALETTE 0x08 // with the Default palette, the effect draws from its own palette ("pal=" in its data, else Party)
+#define PALCOL_DEFAULT_SEEN    0x10 // the effect has run with the Default palette, so PALCOL_DEFAULT_PALETTE is known
 #define SEGMENT          (*strip._currentSegment)
 #define SEGENV           (*strip._currentSegment)
 #define SEGCOLOR(x)      Segment::getCurrentColor(x)
-#define SEGPALETTE       Segment::getCurrentPalette()
+#define SEGPALETTE       SEGMENT.effectPalette() // also notes that the effect draws its own palette when "Default" is selected
 #define SEGLEN           Segment::vLength()
 #define SEG_W            Segment::vWidth()
 #define SEG_H            Segment::vHeight()
@@ -483,7 +486,7 @@ class Segment {
         bool    _manualW  : 1;
       };
     };
-    mutable uint8_t _palColors;       // color slots (bit 0-2) the current effect draws through the palette, learned in color_from_palette()
+    mutable uint8_t _palColors;       // color slots (bit 0-2) the current effect draws through the palette, learned in color_from_palette(), and PALCOL_DEFAULT_* flags
 
     // static variables are use to speed up effect calculations by stashing common pre-calculated values
     static unsigned      _usedSegmentData;    // amount of data used by all segments
@@ -645,7 +648,8 @@ class Segment {
     inline uint16_t length()               const { return width() * height(); }               // segment length (count) in physical pixels
     inline uint16_t groupLength()          const { return grouping + spacing; }
     inline uint8_t  getLightCapabilities() const { return _capabilities; }
-    inline uint8_t  getPaletteColors()     const { return _palColors; }    // color slots the effect draws through the palette (bit mask), see color_from_palette()
+    inline uint8_t  getPaletteColors()     const { return _palColors; }    // color slots the effect draws through the palette (bit mask) and PALCOL_DEFAULT_* flags, see color_from_palette()
+    const CRGBPalette16 &effectPalette() const; // SEGPALETTE (not inline: used in many effects)
     inline void     addPaletteColors(uint8_t slots) const { if (slots & ~_palColors) newPaletteColors(slots); } // for effects that choose between palette and color slots by themselves
     inline void     deactivate()                 { setGeometry(0,0); }
     inline Segment &clearName()                  { p_free(name); name = nullptr; return *this; }

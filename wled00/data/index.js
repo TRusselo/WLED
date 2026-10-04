@@ -1045,9 +1045,9 @@ function setSrc(p)
 // - effects that use the palette on its own show the palette button without a switch
 function updColSrc()
 {
-	let sp = selectedPal, g = palGrad(sp), cp = sp > 1 && sp < 6, m = 0, v = gId('csl').querySelector('button:not(.hide)');
+	let sp = selectedPal, g = palGrad(sp), cp = sp > 1 && sp < 6, m = 0, v = gId('csl').querySelector('button:not(.hide)'), pb = gId('palbtn');
 	if (sp) lastPal = sp;
-	gId('palbtn').style.backgroundImage = g;
+	pb.style.backgroundImage = g;
 	for (let i = 0; i < 3; i++) {
 		let b = gId("csl" + i), r = fxPal && !b.classList.contains('hide') && pcol >> i & 1;
 		m |= r << i;
@@ -1063,6 +1063,18 @@ function updColSrc()
 	gId('palsec').classList.toggle('hide', !fxPal || (s ? !sp : !!m));
 	gId('cpk').classList.toggle('hide', !v || s && sp && !cp);
 	gId('colsec').classList.toggle('hide', !v);
+	// "Default" is the effect's own look; name it once the firmware has seen the effect run with it ("pcol" bit 4):
+	// its own palette (bit 3) and/or the colors it draws through the palette (bits 0-2), else built-in colors (e.g. a rainbow)
+	let pl = gId('pallist'), di = pl.querySelector('[data-id="0"]'), dg = pcol & 8 ? palGrad(defPal) : '', t = [pcol & 8 && (pl.querySelector(`[data-id="${defPal}"] .lstIname`) || {}).innerText, pcol & 7 && 'my colors'].filter(x => x);
+	t = 'Default' + (pcol & 16 ? ': ' + (t.join(' + ') || 'built-in colors') : '');
+	if (di) {
+		di.querySelector('.lstIname').innerText = t;
+		di.lastChild.style.background = dg;
+	}
+	if (!sp) {
+		pb.innerText = t;
+		pb.style.backgroundImage = dg;
+	}
 }
 // AI: end
 

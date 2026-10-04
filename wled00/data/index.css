@@ -452,11 +452,8 @@ button {
 	width: 100%;
 	margin: 0 0 8px;
 	color: var(--c-f);
-	background: var(--c-2);
+	background: var(--c-2) no-repeat bottom / 100% 8px; /* palette preview along the bottom */
 	border-color: var(--c-4);
-}
-#palbtn {
-	background: var(--c-2) no-repeat bottom / 100% 8px;
 }
 #fxn {
 	font-size: 20px;

@@ -643,7 +643,7 @@ static void serializeSegment(JsonObject& root, const Segment& seg, byte id, bool
   root["si"]  = seg.soundSim;
   root["m12"] = seg.map1D2D;
   root["bm"]  = seg.blendMode;
-  if (!forPreset) root["pcol"] = seg.getPaletteColors(); // read-only: color slots the effect draws through the palette (bit mask)
+  if (!forPreset) root["pcol"] = seg.getPaletteColors(); // read-only: color slots the effect draws through the palette (bit mask) and PALCOL_DEFAULT_* flags
 }
 
 void serializeState(JsonObject root, bool forPreset, bool includeBri, bool segmentBounds, bool selectedSegmentsOnly)
