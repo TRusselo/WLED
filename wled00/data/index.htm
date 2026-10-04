@@ -133,15 +133,21 @@
 				</label>
 			</div>
 		</div>
+		<div id="colsec">
 		<p class="sh"><i class="icons sel-icon" onclick="tglHex()">&#xe2b3;</i> Colors</p>
 		<div id="csl">
 			<button id="csl0" class="btn" onclick="selectSlot(0);" data-r="0" data-g="0" data-b="0" data-w="0"></button>
 			<button id="csl1" class="btn" onclick="selectSlot(1);" data-r="0" data-g="0" data-b="0" data-w="0"></button>
 			<button id="csl2" class="btn" onclick="selectSlot(2);" data-r="0" data-g="0" data-b="0" data-w="0"></button>
+		</div>
+		</div>
+		<div id="srcw" class="hide"><button id="src0" class="btn" onclick="setSrc(0)">My color</button><button id="src1" class="btn" onclick="setSrc(1)">Palette</button></div>
+		<div id="palsec">
+			<p class="sh" id="pall">Palette</p>
 			<button id="palbtn" class="btn" onclick="oDlg('paldlg')"></button>
 		</div>
-		<p class="h hide" id="pnote">A palette other than Default replaces some of these colors, depending on the effect.</p>
 		<!-- AI: end -->
+		<div id="cpk">
 		<div id="picker" class="noslide"></div>
 		<div id="hwrap" class="slider">
 			<div title="Hue" class="sliderwrap il">
@@ -217,6 +223,7 @@
 			<input id="hexc" title="Hex RGB" type="text" class="noslide" onkeydown="hexEnter()" autocomplete="off" maxlength="8" />
 			<button id="hexcnf" class="btn btn-xs" onclick="fromHex();"><i class="icons btn-icon">&#xe390;</i></button>
 		</div>
+		</div>
 
 		<div style="padding: 12px 0; display:flex; justify-content:center; gap:16px;" id="btns">
 			<div>
@@ -240,7 +247,6 @@
 		</div>
 		<div id="palw">
 			<dialog id="paldlg">
-				<p class="labels" id="pall">Palette</p>
 				<div class="staytop fnd">
 					<input type="text" placeholder="Search" oninput="search(this,'pallist')" onfocus="search(this,'pallist')" />
 					<i class="icons clear-icon" onclick="clean(this)">&#xe38f;</i>

@@ -289,16 +289,6 @@ button {
 	border: 0;
 }
 
-#liveview2D {
-	height: 90%;
-	width: 90%;
-	border: 0;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%,-50%);
-}
-
 .tab {
 	background-color: transparent;
 	color: var(--c-d);
@@ -378,7 +368,7 @@ button {
 	padding: 4px 0 0;
 }
 
-#segutil, #segutil2, #segcont, #putil, #pcont, #pql, #fx, #palw, #bsp,
+#segutil, #segutil2, #segcont, #putil, #pcont, #pql, #fx, #palw, #palsec, #bsp,
 .fnd {
 	max-width: 280px;
 }
@@ -392,7 +382,7 @@ button {
 	padding-top: 12px;
 }
 
-#fx, #pql, #segcont, #pcont, #sliders, #qcs-w, #hexw, #pall, #ledmap,
+#fx, #pql, #segcont, #pcont, #sliders, #qcs-w, #hexw, #palw, #palsec, #ledmap,
 .slider, .filter, .option, .segname, .pname, .fnd {
 	margin: 0 auto;
 }
@@ -454,8 +444,8 @@ button {
 	color: var(--c-b);
 }
 
-/* current effect, opens the effect list */
-#fxbtn {
+/* current effect / palette, open their lists */
+#fxbtn, #palbtn {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -464,6 +454,9 @@ button {
 	color: var(--c-f);
 	background: var(--c-2);
 	border-color: var(--c-4);
+}
+#palbtn {
+	background: var(--c-2) no-repeat bottom / 100% 8px;
 }
 #fxn {
 	font-size: 20px;
@@ -521,17 +514,31 @@ button {
 #csl .sl {
 	box-shadow: 0 0 0 3px var(--c-1), 0 0 0 5px var(--c-f);
 }
-#palbtn.pls::before {
-	content: "+";
-	position: absolute;
-	left: -27px;
-	top: 8px;
-	font-size: 22px;
+/* color slot replaced by the palette */
+#csl .pt {
+	margin-bottom: 40px;
+}
+#csl .pt::after {
+	content: attr(data-l) "\A from palette";
+	white-space: pre;
 	color: var(--c-b);
 }
-#pnote {
-	max-width: 300px;
+/* My color / Palette switch of the selected color slot */
+#srcw {
+	display: flex;
+	width: 240px;
 	margin: 0 auto 8px;
+	border-radius: 25px;
+	overflow: hidden;
+}
+#srcw .btn {
+	flex: 1;
+	margin: 0;
+	border-radius: 0;
+}
+#srcw .selected {
+	background: var(--c-f);
+	color: var(--c-1);
 }
 
 /* segments changed by the Look tab (opens the Segments tab) */
@@ -813,7 +820,7 @@ img {
 #wbal  .sliderdisplay { background: linear-gradient(90deg, #ff8f1f 0%, #fff 50%, #cbdbff); }
 
 /* wrapper divs hidden by default */
-#liveview, #liveview2D, #roverstar, #pql
+#liveview, #roverstar, #pql
 #rgbwrap, #swrap, #hwrap, #kwrap, #wwrap, #wbal, #qcs-w, #hexw,
 .clear-icon, .edit-icon, .ptxt {
 	display: none;
@@ -945,10 +952,6 @@ input[type=range]::-moz-range-thumb {
 	margin: -4px 4px -1px 0;
 	vertical-align: middle;
 	display: inline-block;
-}
-.btn-n {
-	width: 230px;
-	margin: 0 8px 0 0;
 }
 .btn-p {
 	width: 120px;
@@ -1177,9 +1180,6 @@ textarea {
 .pname {
 	top: 1px;
 }
-.plname {
-	top: 0;
-}
 
 /* preset id number */
 .pid {
@@ -1191,9 +1191,6 @@ textarea {
 	color: var(--c-b);
 }
 
-.newseg {
-	cursor: default;
-}
 /*
 .ic {
 	padding: 6px 0 0 0;
@@ -1565,8 +1562,7 @@ dialog .staytop > .icons {
 	box-sizing: border-box;
 }
 
-.btn-s,
-.btn-n {
+.btn-s {
 	border: 1px solid var(--c-2);
 	background-color: var(--c-2);
 }
