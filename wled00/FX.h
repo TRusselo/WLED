@@ -483,6 +483,7 @@ class Segment {
         bool    _manualW  : 1;
       };
     };
+    mutable uint8_t _palColors;       // color slots (bit 0-2) the current effect draws through the palette, learned in color_from_palette()
 
     // static variables are use to speed up effect calculations by stashing common pre-calculated values
     static unsigned      _usedSegmentData;    // amount of data used by all segments
@@ -539,6 +540,7 @@ class Segment {
     inline uint32_t getPixelColorXYRaw(unsigned x, unsigned y) const              { auto XY = [](unsigned X, unsigned Y){ return X + Y*Segment::vWidth(); }; return pixels[XY(x,y)]; };
   #endif
     void resetIfRequired();         // sets all SEGENV variables to 0 and clears data buffer
+    void newPaletteColors(uint8_t slots) const; // see addPaletteColors()
 
     // transition functions
     void stopTransition();                  // ends transition mode by destroying transition structure (does nothing if not in transition)
@@ -590,6 +592,7 @@ class Segment {
     , _dataLen(0)
     , _default_palette(6)
     , _capabilities(0)
+    , _palColors(0)
     , _t(nullptr)
     {
       DEBUGFX_PRINTF_P(PSTR("-- Creating segment: %p [%d,%d:%d,%d]\n"), this, (int)start, (int)stop, (int)startY, (int)stopY);
@@ -642,6 +645,8 @@ class Segment {
     inline uint16_t length()               const { return width() * height(); }               // segment length (count) in physical pixels
     inline uint16_t groupLength()          const { return grouping + spacing; }
     inline uint8_t  getLightCapabilities() const { return _capabilities; }
+    inline uint8_t  getPaletteColors()     const { return _palColors; }    // color slots the effect draws through the palette (bit mask), see color_from_palette()
+    inline void     addPaletteColors(uint8_t slots) const { if (slots & ~_palColors) newPaletteColors(slots); } // for effects that choose between palette and color slots by themselves
     inline void     deactivate()                 { setGeometry(0,0); }
     inline Segment &clearName()                  { p_free(name); name = nullptr; return *this; }
     inline Segment &setName(const String &name)  { return setName(name.c_str()); }

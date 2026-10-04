@@ -1007,6 +1007,7 @@ static const char _data_FX_MODE_CHASE_RAINBOW_WHITE[] PROGMEM = "Rainbow Runner@
  * Red - Amber - Green - Blue lights running
  */
 void mode_colorful(void) {
+  if (SEGMENT.intensity > 160) SEGMENT.addPaletteColors(0b111); // a palette replaces the 3 colors (used only at high saturation)
   unsigned numColors = 4; //3, 4, or 5
   uint32_t cols[9]{0x00FF0000,0x00EEBB00,0x0000EE00,0x000077CC};
   if (SEGMENT.intensity > 160 || SEGMENT.palette) { //palette or color
@@ -1367,6 +1368,7 @@ void mode_fire_flicker(void) {
   uint32_t cycleTime = 40 + (255 - SEGMENT.speed);
   uint32_t it = strip.now / cycleTime;
   if (SEGENV.step == it) return;
+  SEGMENT.addPaletteColors(0b001); // a palette replaces the main color
 
   byte w = (SEGCOLOR(0) >> 24);
   byte r = (SEGCOLOR(0) >> 16);
@@ -2986,6 +2988,7 @@ void mode_bouncing_balls(void) {
       unsigned numBalls = (SEGMENT.intensity * (maxNumBalls - 1)) / 255 + 1; // minimum 1 ball
       const float gravity = -9.81f; // standard value of gravity
       const bool hasCol2 = SEGCOLOR(2);
+      SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the ball colors
       const unsigned long time = strip.now;
 
       if (SEGENV.call == 0) {
@@ -3061,6 +3064,7 @@ static void mode_rolling_balls(void) {
   // non-chosen color is a random color
   unsigned numBalls = SEGMENT.intensity/16 + 1;
   bool hasCol2 = SEGCOLOR(2);
+  SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the ball colors
 
   if (SEGENV.call == 0) {
     SEGMENT.fill(hasCol2 ? BLACK : SEGCOLOR(1));                    // start clean
@@ -3444,6 +3448,7 @@ void mode_popcorn(void) {
   Spark* popcorn = reinterpret_cast<Spark*>(SEGENV.data);
 
   bool hasCol2 = SEGCOLOR(2);
+  SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the kernel colors
   if (!SEGMENT.check2) SEGMENT.fill(hasCol2 ? BLACK : SEGCOLOR(1));
 
   struct virtualStrip {
@@ -3830,7 +3835,7 @@ void mode_exploding_fireworks(void)
         if (sparks[i].pos > 0 && sparks[i].pos < rows) {
           if (SEGMENT.is2D() && !(sparks[i].posX >= 0 && sparks[i].posX < cols)) continue;
           unsigned prog = sparks[i].col;
-          uint32_t spColor = (SEGMENT.palette) ? SEGMENT.color_wheel(sparks[i].colIndex) : SEGCOLOR(0);
+          uint32_t spColor = SEGMENT.color_from_palette(sparks[i].colIndex, false, true, 0); // main color or palette (same as color_wheel() with a palette)
           CRGBW c = BLACK; //HeatColor(sparks[i].col);
           if (prog > 300) { //fade from white to spark color
             c = color_blend(spColor, WHITE, uint8_t((prog - 300)*5));
@@ -5012,7 +5017,7 @@ void mode_ColorClouds()
     }
 
     uint32_t pixel;
-    if (SEGMENT.palette) { pixel = SEGMENT.color_from_palette(hue, false, true, 0, vol); }
+    if (SEGMENT.palette) { pixel = SEGMENT.color_from_palette(hue, false, true, 255, vol); } // 255: no color slot is replaced, Default shows a rainbow
     else { pixel = CRGBW(CHSV32(hue, 255, vol)); }
 
     // Suppress extremely dark pixels to avoid flickering of plain r/g/b.
@@ -6532,6 +6537,7 @@ void mode_2Dscrollingtext(void) {
   // otherwise col2 == BLACK means use currently selected palette for gradient
   // if gradient is not selected set both colors the same
   if (SEGMENT.check1) { // use gradient
+    SEGMENT.addPaletteColors(0b100); // a palette replaces the gradient color
     if (SEGMENT.palette == 0) { // use colors for gradient
       col1 = SEGCOLOR(0);
       col2 = SEGCOLOR(2);
