@@ -1033,15 +1033,14 @@ function redrawPalPrev()
 // My color / Palette switch of the selected color slot (the palette is per segment, so this switches all slots the effect draws through it)
 function setSrc(p)
 {
-	if (p && !lastPal) oDlg('paldlg'); // no palette chosen yet
-	else setPalette(p && lastPal);
+	setPalette(p && (lastPal || 6)); // last palette, or Party (the firmware's default) if none was chosen yet
 }
 
 // shows the controls that apply to the selected color slot:
 // - slots the effect draws through the palette ("pcol", learned by the firmware in Segment::color_from_palette()) get the My color / Palette switch;
-//   any palette but Default replaces them, then the palette button takes the place of the color picker
-// - "* Color" palettes (2-5) are made from the colors, so they keep the color picker
-// - effects that use the palette on its own show the palette button without a switch
+//   any palette but Default replaces them, then the palette list takes the place of the color picker
+// - "* Color" palettes (2-5) are made from the colors, so they keep the color picker (and the palette button opens the list)
+// - effects that use the palette on its own show the palette list (no colors) or the palette button (with colors), without a switch
 function updColSrc()
 {
 	let sp = selectedPal, g = palGrad(sp), cp = sp > 1 && sp < 6, m = 0, v = gId('csl').querySelector('button:not(.hide)');
@@ -1051,17 +1050,23 @@ function updColSrc()
 		let b = gId("csl" + i), r = fxPal && !b.classList.contains('hide') && pcol >> i & 1;
 		m |= r << i;
 		r = r && sp && !cp; // comes from the palette
-		b.classList.toggle('pt', !!r);
+		b.classList.toggle('pt', r);
 		if (r) b.style.background = g; else setCSL(b);
 	}
 	let s = m >> csel & 1; // the selected slot has the switch
 	gId('srcw').classList.toggle('hide', !s);
 	gId('src0').classList.toggle('selected', !sp);
-	gId('src1').classList.toggle('selected', !!sp);
-	gId('pall').classList.toggle('hide', !!s);
-	gId('palsec').classList.toggle('hide', !fxPal || (s ? !sp : !!m));
-	gId('cpk').classList.toggle('hide', !v || s && sp && !cp);
+	gId('src1').classList.toggle('selected', sp);
+	gId('pall').classList.toggle('hide', s);
+	let pv = fxPal && (s ? sp : !m), ph = !v || s && sp && !cp, pw = gId('palw'), d = gId('paldlg'); // palette shown, color picker hidden
+	gId('palsec').classList.toggle('hide', !pv);
+	gId('cpk').classList.toggle('hide', ph);
 	gId('colsec').classList.toggle('hide', !v);
+	pv = pv && ph; // the palette list takes the place of the color picker
+	gId('palbtn').classList.toggle('hide', pv);
+	let e = !pw.classList.contains('inl') && d.querySelector(`[data-id="${sp}"]`); // list just shown: scroll it (not the page) so the current palette is right below the search field
+	pw.classList.toggle('inl', pv);
+	if (pv && e) d.scrollTop = e.offsetTop;
 }
 // AI: end
 
@@ -2799,8 +2804,6 @@ setInterval(()=>{
 	gId('heart').style.color = `hsl(${hc}, 100%, 50%)`;
 }, 910);
 
-function openGH() { window.open("https://github.com/wled/WLED/wiki"); }
-
 var cnfr = false;
 function cnfReset()
 {
@@ -3039,13 +3042,6 @@ function expand(i)
 		behavior: 'smooth',
 		block: 'center'
 	});
-}
-
-function unfocusSliders()
-{
-	gId("sliderBri").blur();
-	gId("sliderSpeed").blur();
-	gId("sliderIntensity").blur();
 }
 
 // sliding UI

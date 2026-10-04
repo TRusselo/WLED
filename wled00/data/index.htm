@@ -147,6 +147,26 @@
 			<button id="palbtn" class="btn" onclick="oDlg('paldlg')"></button>
 		</div>
 		<!-- AI: end -->
+		<div id="palw">
+			<dialog id="paldlg">
+				<div class="staytop fnd">
+					<input type="text" placeholder="Search" oninput="search(this,'pallist')" onfocus="search(this,'pallist')" />
+					<i class="icons clear-icon" onclick="clean(this)">&#xe38f;</i>
+					<i class="icons search-icon">&#xe0a1;</i>
+				</div>
+				<div id="pallist" class="list">
+					<div class="lstI">
+						<label class="radio schkl" onclick="loadPalettes()">
+							<div class="lstIcontent">
+								<span class="lstIname">
+									Loading...
+								</span>
+							</div>
+						</label>
+					</div>
+				</div>
+			</dialog>
+		</div>
 		<div id="cpk">
 		<div id="picker" class="noslide"></div>
 		<div id="hwrap" class="slider">
@@ -244,26 +264,6 @@
 				</button>
 				<div class="iconlabel">Palettes</div>
 			</div>
-		</div>
-		<div id="palw">
-			<dialog id="paldlg">
-				<div class="staytop fnd">
-					<input type="text" placeholder="Search" oninput="search(this,'pallist')" onfocus="search(this,'pallist')" />
-					<i class="icons clear-icon" onclick="clean(this)">&#xe38f;</i>
-					<i class="icons search-icon">&#xe0a1;</i>
-				</div>
-				<div id="pallist" class="list">
-					<div class="lstI">
-						<label class="radio schkl" onclick="loadPalettes()">
-							<div class="lstIcontent">
-								<span class="lstIname">
-									Loading...
-								</span>
-							</div>
-						</label>
-					</div>
-				</div>
-			</dialog>
 		</div>
 	</div>
 
