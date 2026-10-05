@@ -47,6 +47,7 @@ CRGBPalette16 Segment::_randomPalette     = generateRandomPalette();  // was CRG
 CRGBPalette16 Segment::_newRandomPalette  = generateRandomPalette();  // was CRGBPalette16(DEFAULT_COLOR);
 uint16_t      Segment::_lastPaletteChange = 0; // in seconds; perhaps it should be per segment
 uint16_t      Segment::_nextPaletteBlend  = 0; // in millis
+unsigned long Segment::_palLearnStart     = 0; // in millis
 
 bool     Segment::_modeBlend = false;
 uint16_t Segment::_clipStart = 0;
@@ -612,7 +613,7 @@ Segment &Segment::setMode(uint8_t fx, bool loadDefaults) {
   if (fx != mode) {
     startTransition(strip.getTransition(), true); // set effect transitions (must create segment copy)
     mode = fx;
-    _palColors = 0; // learned again from the new effect
+    _palColors = _palLearn = 0; // learned again from the new effect
     int sOpt;
     // load default values from effect string
     if (loadDefaults) {
@@ -1173,8 +1174,22 @@ void Segment::updatePaletteColors(uint8_t v) const {
 
 // SEGPALETTE: the palette for the current effect; with the Default palette this is the effect's own palette, which the UI names (PALCOL_DEFAULT_PALETTE)
 const CRGBPalette16 &Segment::effectPalette() const {
-  if (!palette) addPaletteColors(PALCOL_DEFAULT_PALETTE);
+  addPaletteColors(palette ? 0 : PALCOL_DEFAULT_PALETTE);
   return _currentPalette;
+}
+
+// called by WS2812FX::service() after each effect call: notes that the effect has run with "Default" (so the UI can name what it shows), and
+// once PALCOL_LEARN_TIME has passed since a state change, replaces the learned colors with those the effect reported since then.
+// This removes colors the effect no longer uses (e.g. after a slider or color change). Effects that report nothing keep what was learned.
+void Segment::endPaletteFrame() const {
+  uint8_t v = _palColors;
+  if (!palette) v |= PALCOL_DEFAULT_SEEN;
+  if ((_palLearn & PALCOL_REPORTED) && millis() - _palLearnStart >= PALCOL_LEARN_TIME) {
+    uint8_t m = palette ? 0x07 : 0x07 | PALCOL_DEFAULT_PALETTE; // what "Default" shows can only be learned with "Default"
+    v = (v & ~m) | (_palLearn & m);
+    _palLearn = 0;
+  }
+  if (v != _palColors) updatePaletteColors(v);
 }
 // AI: end
 
@@ -1187,6 +1202,7 @@ uint32_t Segment::color_wheel(uint8_t pos) const {
   // color_wheel is a continuous (moving) wheel, so wrap end->start (restores pre-0.16 behaviour)
   // mcol 255: the wheel does not replace a color slot (same result as 0 here, the white channel comes from slot 0 either way)
   if (palette) return color_from_palette(pos, false, true, 255);
+  addPaletteColors(0); // built-in colors: no color slot, not the effect's palette
   CRGBW rgb;
   rgb = CHSV32(static_cast<uint16_t>(pos << 8), 255, 255);
   rgb.w = W(getCurrentColor(0)); // add white channel
@@ -1204,8 +1220,7 @@ uint32_t Segment::color_wheel(uint8_t pos) const {
  * @returns Single color from palette
  */
 uint32_t Segment::color_from_palette(uint16_t i, bool mapping, bool moving, uint8_t mcol, uint8_t pbri) const {
-  if (mcol < NUM_COLORS) addPaletteColors(1U << mcol);                // remember the color slots this effect draws through the palette
-  else if (!palette)     addPaletteColors(PALCOL_DEFAULT_PALETTE);    // "Default" shows the effect's own palette
+  addPaletteColors(mcol < NUM_COLORS ? 1U << mcol : palette ? 0 : PALCOL_DEFAULT_PALETTE); // the color slots this effect draws through the palette, or "Default" shows the effect's own palette
   uint32_t color = getCurrentColor(mcol);
   // default palette or no RGB support on segment
   if ((palette == 0 && mcol < NUM_COLORS) || !_isRGB) {
@@ -1390,7 +1405,7 @@ void WS2812FX::service() {
         _currentSegment = &seg;             // set current segment for effect functions (SEGMENT & SEGENV)
         // workaround for on/off transition to respect blending style
         _mode[seg.mode]();                  // run new/current mode (needed for bri workaround)
-        if (!seg.palette) seg.addPaletteColors(PALCOL_DEFAULT_SEEN); // the UI can now tell what "Default" shows for this effect
+        seg.endPaletteFrame();              // what the UI shows for the colors and "Default"
         seg.call++;
         // if segment is in transition and no old segment exists we don't need to run the old mode
         // (blendSegments() takes care of On/Off transitions and clipping)

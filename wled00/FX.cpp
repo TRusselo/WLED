@@ -1007,7 +1007,7 @@ static const char _data_FX_MODE_CHASE_RAINBOW_WHITE[] PROGMEM = "Rainbow Runner@
  * Red - Amber - Green - Blue lights running
  */
 void mode_colorful(void) {
-  SEGMENT.setPaletteColors(SEGMENT.intensity > 160 ? 0b111 : 0); // the 3 colors are used (and replaced by a palette) only at high saturation
+  SEGMENT.addPaletteColors(SEGMENT.intensity > 160 ? 0b111 : 0); // the 3 colors are used (and replaced by a palette) only at high saturation
   unsigned numColors = 4; //3, 4, or 5
   uint32_t cols[9]{0x00FF0000,0x00EEBB00,0x0000EE00,0x000077CC};
   if (SEGMENT.intensity > 160 || SEGMENT.palette) { //palette or color
@@ -2192,8 +2192,9 @@ void mode_fire_2012() {
       }
 
       // Step 4.  Map from heat cells to LED colors
+      const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
       for (unsigned j = 0; j < SEGLEN; j++) {
-        SEGMENT.setPixelColor(indexToVStrip(j, stripNr), ColorFromPalette(SEGPALETTE, min(heat[j], byte(240)), 255, NOBLEND));
+        SEGMENT.setPixelColor(indexToVStrip(j, stripNr), ColorFromPalette(pal, min(heat[j], byte(240)), 255, NOBLEND));
       }
     }
   };
@@ -2579,7 +2580,7 @@ static const char _data_FX_MODE_RIPPLE_RAINBOW[] PROGMEM = "Ripple Rainbow@!,Wav
 //
 //  TwinkleFOX: Twinkling 'holiday' lights that fade in and out.
 //  Colors are chosen from a palette. Read more about this effect using the link above!
-static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat)
+static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat, const CRGBPalette16 &pal)
 {
   // Overall twinkle speed (changed)
   unsigned ticks = ms / SEGENV.aux0;
@@ -2618,7 +2619,7 @@ static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat)
   unsigned hue = slowcycle8 - salt;
   CRGBW c;
   if (bright > 0) {
-    c = ColorFromPalette(SEGPALETTE, hue, gamma8inv(bright), NOBLEND); // note on gamma8inv: inverting results in non-linear brightness fade as originally designed
+    c = ColorFromPalette(pal, hue, gamma8inv(bright), NOBLEND); // note on gamma8inv: inverting results in non-linear brightness fade as originally designed
     if (!SEGMENT.check1) {
       // This code takes a pixel, and if its in the 'fading down'
       // part of the cycle, it adjusts the color a little bit like the
@@ -2665,6 +2666,7 @@ static void twinklefox_base(bool cat)
   }
 
   bglight = bg.getRGBaverage(); // update after scaling
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (unsigned i = 0; i < SEGLEN; i++) {
 
@@ -2679,7 +2681,7 @@ static void twinklefox_base(bool cat)
     // We now have the adjusted 'clock' for this pixel, now we call
     // the function that computes what color the pixel should be based
     // on the "brightness = f( time )" idea.
-    CRGBW c = twinklefox_one_twinkle(myclock30, myunique8, cat);
+    CRGBW c = twinklefox_one_twinkle(myclock30, myunique8, cat, pal);
 
     unsigned cbright = c.getRGBaverage();
     int deltabright = cbright - bglight;
@@ -5165,7 +5167,7 @@ static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size
 // Black hole
 void mode_2DBlackHole(void) {            // By: Stepko https://editor.soulmatelights.com/gallery/1012 , Modified by: Andrew Tuline
   if (!strip.isMatrix || !SEGMENT.is2D()) FX_FALLBACK_STATIC; // not a 2D set-up
-  SEGMENT.setPaletteColors(SEGMENT.check1); // the main color is used (and replaced by a palette) only with "Solid"
+  SEGMENT.addPaletteColors(SEGMENT.check1); // the main color is used (and replaced by a palette) only with "Solid"
 
   const int cols = SEG_W;
   const int rows = SEG_H;
@@ -5844,11 +5846,12 @@ void mode_2Dnoise(void) {                  // By Andrew Tuline
   const int rows = SEG_H;
 
   const unsigned scale  = SEGMENT.intensity+2;
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < cols; x++) {
       uint8_t pixelHue8 = perlin8(x * scale, y * scale, strip.now / (16 - SEGMENT.speed/16));
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, pixelHue8));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, pixelHue8));
     }
   }
 } // mode_2Dnoise()
@@ -6067,6 +6070,7 @@ void mode_2Dtartan(void) {          // By: Elliott Kember  https://editor.soulma
   int offsetX = beatsin16_t(3, -360, 360);
   int offsetY = beatsin16_t(2, -360, 360);
   int sharpness = SEGMENT.custom3 / 8; // 0-3
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
@@ -6074,12 +6078,12 @@ void mode_2Dtartan(void) {          // By: Elliott Kember  https://editor.soulma
       intensity = bri = sin8_t(x * SEGMENT.speed/2 + offsetX);
       for (int i=0; i<sharpness; i++) intensity *= bri;
       intensity >>= 8*sharpness;
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, hue, intensity, LINEARBLEND));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, hue, intensity, LINEARBLEND));
       hue = y * 3 + offsetX;
       intensity = bri = sin8_t(y * SEGMENT.intensity/2 + offsetY);
       for (int i=0; i<sharpness; i++) intensity *= bri;
       intensity >>= 8*sharpness;
-      SEGMENT.addPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, hue, intensity, LINEARBLEND));
+      SEGMENT.addPixelColorXY(x, y, ColorFromPalette(pal, hue, intensity, LINEARBLEND));
     }
   }
 } // mode_2DTartan()
@@ -7981,6 +7985,7 @@ void mode_2Doctopus() {
   }
 
   SEGENV.step += SEGMENT.speed / 32 + 1;  // 1-4 range
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
   for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
       byte angle = rMap[XY(x,y)].angle;
@@ -7988,7 +7993,7 @@ void mode_2Doctopus() {
       //CRGB c = CHSV(SEGENV.step / 2 - radius, 255, sin8_t(sin8_t((angle * 4 - radius) / 4 + SEGENV.step) + radius - SEGENV.step * 2 + angle * (SEGMENT.custom3/3+1)));
       unsigned intensity = sin8_t(sin8_t((angle * 4 - radius) / 4 + SEGENV.step/2) + radius - SEGENV.step + angle * (SEGMENT.custom3/4+1));
       //intensity = map((intensity*intensity) & 0xFFFF, 0, 65535, 0, 255); // add a bit of non-linearity for cleaner display -> no longer needed with proper gamma correction
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, SEGENV.step / 2 - radius, intensity));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, SEGENV.step / 2 - radius, intensity));
     }
   }
 }
@@ -8008,11 +8013,12 @@ void mode_2Dwavingcell() {
   uint32_t aX = SEGMENT.custom1/16 + 9;
   uint32_t aY = SEGMENT.custom2/16 + 1;
   uint32_t aZ = SEGMENT.custom3 + 1;
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
    for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
       uint32_t wave = sin8_t((x * aX) + sin8_t((((y<<8) + t) * aY)>>8)) + cos8_t(y * aZ); // bit shifts to increase temporal resolution
       uint8_t colorIndex = wave + (t>>(8-(SEGMENT.check2*3)));
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, colorIndex));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, colorIndex));
     }
   }
   SEGMENT.blur(SEGMENT.intensity);

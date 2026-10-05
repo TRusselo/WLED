@@ -125,6 +125,7 @@
 		if (!sett) gId('lserr').style.display = "inline";
 		try {
 			sett = JSON.parse(sett);
+			if (sett && sett.comp) delete sett.comp.pcmbot; // removed with PC mode
 		} catch (e) {
 			sett = {};
 			gId('lserr').style.display = "inline";
