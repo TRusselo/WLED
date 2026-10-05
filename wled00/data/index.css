@@ -530,6 +530,13 @@ button {
 	white-space: pre;
 	color: var(--c-b);
 }
+/* palette list in place of the color picker; it stays after a palette is chosen */
+.inl #paldlg:not([open]) {
+	display: block;
+	position: static;
+	width: auto;
+	max-height: 50vh;
+}
 /* My color / Palette switch of the selected color slot */
 #srcw {
 	display: flex;

@@ -1039,16 +1039,14 @@ function redrawPalPrev()
 // My color / Palette switch of the selected color slot (the palette is per segment, so this switches all slots the effect draws through it)
 function setSrc(p)
 {
-	let f = p && !lastPal; // no palette chosen yet: use Party (the firmware's default) and open the palette list
-	setPalette(p && (lastPal || 6));
-	if (f) oDlg('paldlg');
+	setPalette(p && (lastPal || 6)); // last palette, or Party (the firmware's default) if none was chosen yet; the palette list then shows in place of the color picker
 }
 
 // shows the controls that apply to the selected color slot:
 // - slots the effect draws through the palette ("pcol", learned by the firmware in Segment::color_from_palette()) get the My color / Palette switch;
-//   any palette but Default replaces them, then the palette button takes the place of the color picker
-// - "* Color" palettes (2-5) are made from the colors, so they keep the color picker
-// - effects that use the palette on its own show the palette button without a switch
+//   any palette but Default replaces them, then the palette list takes the place of the color picker
+// - "* Color" palettes (2-5) are made from the colors, so they keep the color picker (and the palette button opens the list)
+// - effects that use the palette on its own show the palette list (no colors) or the palette button (with colors), without a switch
 function updColSrc()
 {
 	let sp = selectedPal, g = palGrad(sp), cp = sp > 1 && sp < 6, m = 0, v = gId('csl').querySelector('button:not(.hide)'), pb = gId('palbtn');
@@ -1066,9 +1064,19 @@ function updColSrc()
 	gId('src0').classList.toggle('selected', !sp);
 	gId('src1').classList.toggle('selected', !!sp);
 	gId('pall').classList.toggle('hide', !!s);
-	gId('palsec').classList.toggle('hide', !fxPal || (s ? !sp : !!m));
-	gId('cpk').classList.toggle('nocol', !v || s && sp && !cp); // the white channel and white balance sliders stay (the white channel is not replaced by the palette)
+	let pv = fxPal && (s ? sp : !m), ph = !v || s && sp && !cp, pw = gId('palw'), d = gId('paldlg'); // palette shown, color picker hidden
+	gId('palsec').classList.toggle('hide', !pv);
+	gId('cpk').classList.toggle('nocol', ph); // the white channel and white balance sliders stay (the white channel is not replaced by the palette)
 	gId('colsec').classList.toggle('hide', !v);
+	pv = pv && ph; // the palette list takes the place of the color picker
+	pb.classList.toggle('hide', pv);
+	let wi = pw.classList.contains('inl');
+	pw.classList.toggle('inl', pv);
+	let e = pv && d.querySelector(`[data-id="${sp}"]`);
+	if (e) { // list just shown, or the current palette is out of view (e.g. changed by a preset): scroll the list (not the page) so it is right below the search field
+		let r = e.getBoundingClientRect();
+		if (!wi || r.top < d.querySelector('.fnd').getBoundingClientRect().bottom || r.bottom > d.getBoundingClientRect().bottom) d.scrollTop = e.offsetTop;
+	}
 	// "Default" is the effect's own look; name it once the firmware has seen the effect run with it ("pcol" bit 4):
 	// its own palette (bit 3) and/or the colors it draws through the palette (bits 0-2), else built-in colors (e.g. a rainbow)
 	let pl = gId('pallist'), di = pl.querySelector('[data-id="0"]'), dg = pcol & 8 ? palGrad(defPal) : '', t = [pcol & 8 && (pl.querySelector(`[data-id="${defPal}"] .lstIname`) || {}).innerText, pcol & 7 && 'my colors'].filter(x => x);
@@ -1393,7 +1401,7 @@ function updateSelectedPalette(s)
 	var selectedPalette = parent.querySelector(`.lstI[data-id="${s}"]`);
 	if (!selectedPalette) return; // palette not yet loaded (custom palette on initial load)
 	selectedPalette.classList.add('selected');
-	if (selElement !== selectedPalette) selectedPalette.scrollIntoView({block: 'nearest'}); // keep a newly selected palette visible in the open list
+	if (selElement !== selectedPalette && gId('paldlg').open) selectedPalette.scrollIntoView({block: 'nearest'}); // keep a newly selected palette visible in the open popup list
 
 	// show the selected palette on the palette swatch next to the colors
 	let pb = gId('palbtn');
