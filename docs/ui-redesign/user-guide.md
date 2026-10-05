@@ -1,5 +1,7 @@
 # The redesigned web UI: user guide
 
+Screenshots: QuinLED Dig-Uno v3 (ESP32) running the betas of 2026-10-05.
+
 How the redesigned main page works. Applies to both variants; where they differ, A is the palette button with a popup list
 (`ui-redesign`) and B is the palette card (`ui-redesign-palette-card`).
 
@@ -11,7 +13,11 @@ How the redesigned main page works. Applies to both variants; where they differ,
   hides controls (see "Changes from upstream" below).
 - The PC Mode button is gone; the layout follows the screen width.
 
+![Wide screen: effect list, Look, Segments and Presets side by side](img/desktop-wide.png)
+
 ## Look tab, from top to bottom
+
+<img src="img/look-top.png" width="300" alt="Look tab on a phone: effect, its sliders, colors with the My color / Palette switch">
 
 ### Which segments change
 
@@ -31,6 +37,8 @@ The chips double as the legend for the icons in the list:
 | 2D | ▦ | runs on a matrix |
 | volume | ♪ | reacts to sound volume (audio reactive) |
 | frequency | ♫ | reacts to sound frequencies (audio reactive) |
+
+<img src="img/effect-list.png" width="300" alt="Effect list with search and filter chips">
 
 Checked chips filter the list to effects that have all checked features. Without a 2D matrix, effects that only run in 2D are not
 listed; the 2D chip then shows the effects that run in both 1D and 2D.
@@ -61,6 +69,10 @@ A color that the effect draws through the palette gets a switch below the color 
     It scrolls to the current palette when it appears or when the palette is changed elsewhere (preset, another app).
 - The color circle then shows the palette, with "from palette" under its name.
 
+| A: palette button | A: popup list | B: palette card |
+|---|---|---|
+| <img src="img/a-palette-button.png" width="230" alt="Variant A: palette shown as a button"> | <img src="img/a-palette-popup.png" width="230" alt="Variant A: palette list as a popup"> | <img src="img/b-palette-card.png" width="230" alt="Variant B: palette list as a card in place of the color picker"> |
+
 There is no switch on colors that a palette never replaces (for example the background of many effects).
 Effects that only use the palette (Fire 2012, Rainbow, ...) show only the palette (A: button, B: card).
 
@@ -83,6 +95,8 @@ Default entry is named for that effect:
 - "Default: built-in colors" (for example a rainbow that is not a palette).
 
 Until the device has run the effect with Default, the entry reads just "Default".
+
+<img src="img/default-fire.png" width="300" alt="Fire 2012: the Default entry is named Default: Fire, with the Fire palette preview">
 
 ### White channel and white balance
 
