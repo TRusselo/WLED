@@ -8,6 +8,7 @@
 | Beta | [`beta-ui-redesign`](https://github.com/TRusselo/WLED/releases/tag/beta-ui-redesign) | [`beta-ui-redesign-palette-card`](https://github.com/TRusselo/WLED/releases/tag/beta-ui-redesign-palette-card) |
 | With "Palette" selected for a color, and for palette-only effects | the palette is a button; it opens the palette list as a popup, which closes after a palette is picked | the palette list is shown as a card where the color picker was and stays open |
 | Main page, gzipped | 40,237 B | 40,376 B |
+| Screenshot | <img src="img/a-palette-button.png" width="230" alt="Variant A"> | <img src="img/b-palette-card.png" width="230" alt="Variant B"> |
 
 Everything else is the same. B is A plus one commit (25bf6ed); changes to A are merged into B so both stay current.
 B brings back the inline list of e3ce97c, which a WLED developer preferred; A is the popup list the fork owner prefers.
