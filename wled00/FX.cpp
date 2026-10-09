@@ -136,7 +136,7 @@ static um_data_t* getAudioData() {
 void mode_static(void) {
   SEGMENT.fill(SEGCOLOR(0));
 }
-static const char _data_FX_MODE_STATIC[] PROGMEM = "Solid";
+static const char _data_FX_MODE_STATIC[] PROGMEM = "Solid@;!;";
 
 /*
  * Copy a segment and perform (optional) color adjustments
@@ -1007,6 +1007,7 @@ static const char _data_FX_MODE_CHASE_RAINBOW_WHITE[] PROGMEM = "Rainbow Runner@
  * Red - Amber - Green - Blue lights running
  */
 void mode_colorful(void) {
+  SEGMENT.addPaletteColors(SEGMENT.intensity > 160 ? 0b111 : 0); // the 3 colors are used (and replaced by a palette) only at high saturation
   unsigned numColors = 4; //3, 4, or 5
   uint32_t cols[9]{0x00FF0000,0x00EEBB00,0x0000EE00,0x000077CC};
   if (SEGMENT.intensity > 160 || SEGMENT.palette) { //palette or color
@@ -1043,7 +1044,7 @@ void mode_colorful(void) {
     for (unsigned j = 0; j < numColors; j++) SEGMENT.setPixelColor(i + j, cols[SEGENV.aux0 + j]);
   }
 }
-static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Saturation;1,2,3;!";
+static const char _data_FX_MODE_COLORFUL[] PROGMEM = "Colorful@!,Pastel / Classic / My colors;;!";
 
 
 /*
@@ -1367,6 +1368,7 @@ void mode_fire_flicker(void) {
   uint32_t cycleTime = 40 + (255 - SEGMENT.speed);
   uint32_t it = strip.now / cycleTime;
   if (SEGENV.step == it) return;
+  SEGMENT.addPaletteColors(0b001); // a palette replaces the main color
 
   byte w = (SEGCOLOR(0) >> 24);
   byte r = (SEGCOLOR(0) >> 16);
@@ -1451,7 +1453,7 @@ void mode_two_dots() {
     SEGMENT.setPixelColor(indexB, color2);
   }
 }
-static const char _data_FX_MODE_TWO_DOTS[] PROGMEM = "Two Dots@!,Dot size,,,,,Overlay;1,2,Bg;!";
+static const char _data_FX_MODE_TWO_DOTS[] PROGMEM = "Two Dots@!,Dot size,,,,,Overlay;1,2,Bg;";
 
 
 /*
@@ -1900,7 +1902,7 @@ void mode_oscillate(void) {
 
   SEGENV.step = it;
 }
-static const char _data_FX_MODE_OSCILLATE[] PROGMEM = "Oscillate";
+static const char _data_FX_MODE_OSCILLATE[] PROGMEM = "Oscillate@!,!;1,2,3;";
 
 
 void mode_lightning(void) {
@@ -2190,8 +2192,9 @@ void mode_fire_2012() {
       }
 
       // Step 4.  Map from heat cells to LED colors
+      const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
       for (unsigned j = 0; j < SEGLEN; j++) {
-        SEGMENT.setPixelColor(indexToVStrip(j, stripNr), ColorFromPalette(SEGPALETTE, min(heat[j], byte(240)), 255, NOBLEND));
+        SEGMENT.setPixelColor(indexToVStrip(j, stripNr), ColorFromPalette(pal, min(heat[j], byte(240)), 255, NOBLEND));
       }
     }
   };
@@ -2470,7 +2473,7 @@ void mode_railway() {
   }
   SEGENV.step += FRAMETIME;
 }
-static const char _data_FX_MODE_RAILWAY[] PROGMEM = "Railway@!,Smoothness;1,2;!;;pal=3";
+static const char _data_FX_MODE_RAILWAY[] PROGMEM = "Railway@!,Smoothness;;!;;pal=3";
 
 
 //Water ripple
@@ -2577,7 +2580,7 @@ static const char _data_FX_MODE_RIPPLE_RAINBOW[] PROGMEM = "Ripple Rainbow@!,Wav
 //
 //  TwinkleFOX: Twinkling 'holiday' lights that fade in and out.
 //  Colors are chosen from a palette. Read more about this effect using the link above!
-static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat)
+static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat, const CRGBPalette16 &pal)
 {
   // Overall twinkle speed (changed)
   unsigned ticks = ms / SEGENV.aux0;
@@ -2616,7 +2619,7 @@ static CRGBW twinklefox_one_twinkle(uint32_t ms, uint8_t salt, bool cat)
   unsigned hue = slowcycle8 - salt;
   CRGBW c;
   if (bright > 0) {
-    c = ColorFromPalette(SEGPALETTE, hue, gamma8inv(bright), NOBLEND); // note on gamma8inv: inverting results in non-linear brightness fade as originally designed
+    c = ColorFromPalette(pal, hue, gamma8inv(bright), NOBLEND); // note on gamma8inv: inverting results in non-linear brightness fade as originally designed
     if (!SEGMENT.check1) {
       // This code takes a pixel, and if its in the 'fading down'
       // part of the cycle, it adjusts the color a little bit like the
@@ -2663,6 +2666,7 @@ static void twinklefox_base(bool cat)
   }
 
   bglight = bg.getRGBaverage(); // update after scaling
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (unsigned i = 0; i < SEGLEN; i++) {
 
@@ -2677,7 +2681,7 @@ static void twinklefox_base(bool cat)
     // We now have the adjusted 'clock' for this pixel, now we call
     // the function that computes what color the pixel should be based
     // on the "brightness = f( time )" idea.
-    CRGBW c = twinklefox_one_twinkle(myclock30, myunique8, cat);
+    CRGBW c = twinklefox_one_twinkle(myclock30, myunique8, cat, pal);
 
     unsigned cbright = c.getRGBaverage();
     int deltabright = cbright - bglight;
@@ -2701,14 +2705,14 @@ void mode_twinklefox()
 {
   twinklefox_base(false);
 }
-static const char _data_FX_MODE_TWINKLEFOX[] PROGMEM = "Twinklefox@!,Twinkle rate,,,,Cool;!,!;!";
+static const char _data_FX_MODE_TWINKLEFOX[] PROGMEM = "Twinklefox@!,Twinkle rate,,,,Cool;,!;!";
 
 
 void mode_twinklecat()
 {
   twinklefox_base(true);
 }
-static const char _data_FX_MODE_TWINKLECAT[] PROGMEM = "Twinklecat@!,Twinkle rate,,,,Cool,Reverse;!,!;!";
+static const char _data_FX_MODE_TWINKLECAT[] PROGMEM = "Twinklecat@!,Twinkle rate,,,,Cool,Reverse;,!;!";
 
 
 void mode_halloween_eyes()
@@ -2986,6 +2990,7 @@ void mode_bouncing_balls(void) {
       unsigned numBalls = (SEGMENT.intensity * (maxNumBalls - 1)) / 255 + 1; // minimum 1 ball
       const float gravity = -9.81f; // standard value of gravity
       const bool hasCol2 = SEGCOLOR(2);
+      SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the ball colors
       const unsigned long time = strip.now;
 
       if (SEGENV.call == 0) {
@@ -3061,6 +3066,7 @@ static void mode_rolling_balls(void) {
   // non-chosen color is a random color
   unsigned numBalls = SEGMENT.intensity/16 + 1;
   bool hasCol2 = SEGCOLOR(2);
+  SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the ball colors
 
   if (SEGENV.call == 0) {
     SEGMENT.fill(hasCol2 ? BLACK : SEGCOLOR(1));                    // start clean
@@ -3327,7 +3333,7 @@ static void mode_pacman(void) {
 
   SEGMENT.blur(SEGMENT.custom2>>1);
 }
-static const char _data_FX_MODE_PACMAN[] PROGMEM = "PacMan@Speed,# of PowerDots,Blink distance,Blur,# of Ghosts,Dots,Smear,Compact;;!;1;m12=0,sx=192,ix=64,c1=64,c2=0,c3=12,o1=1,o2=0";
+static const char _data_FX_MODE_PACMAN[] PROGMEM = "PacMan@Speed,# of PowerDots,Blink distance,Blur,# of Ghosts,Dots,Smear,Compact;;;1;m12=0,sx=192,ix=64,c1=64,c2=0,c3=12,o1=1,o2=0";
 
 
 /*
@@ -3444,6 +3450,7 @@ void mode_popcorn(void) {
   Spark* popcorn = reinterpret_cast<Spark*>(SEGENV.data);
 
   bool hasCol2 = SEGCOLOR(2);
+  SEGMENT.addPaletteColors(hasCol2 ? 0b111 : 0b001); // a palette replaces the kernel colors
   if (!SEGMENT.check2) SEGMENT.fill(hasCol2 ? BLACK : SEGCOLOR(1));
 
   struct virtualStrip {
@@ -3830,7 +3837,7 @@ void mode_exploding_fireworks(void)
         if (sparks[i].pos > 0 && sparks[i].pos < rows) {
           if (SEGMENT.is2D() && !(sparks[i].posX >= 0 && sparks[i].posX < cols)) continue;
           unsigned prog = sparks[i].col;
-          uint32_t spColor = (SEGMENT.palette) ? SEGMENT.color_wheel(sparks[i].colIndex) : SEGCOLOR(0);
+          uint32_t spColor = SEGMENT.color_from_palette(sparks[i].colIndex, false, true, 0); // main color or palette (same as color_wheel() with a palette)
           CRGBW c = BLACK; //HeatColor(sparks[i].col);
           if (prog > 300) { //fade from white to spark color
             c = color_blend(spColor, WHITE, uint8_t((prog - 300)*5));
@@ -3942,7 +3949,7 @@ void mode_drip(void)
   for (unsigned stripNr=0; stripNr<strips; stripNr++)
     virtualStrip::runStrip(stripNr, &drops[stripNr*maxNumDrops]);
 }
-static const char _data_FX_MODE_DRIP[] PROGMEM = "Drip@Gravity,# of drips,,,,,Overlay;!,!;!;;m12=1"; //bar
+static const char _data_FX_MODE_DRIP[] PROGMEM = "Drip@Gravity,# of drips,,,,,Overlay;!,!;;;m12=1"; //bar
 
 /*
  * Tetris or Stacking (falling bricks) Effect
@@ -4615,7 +4622,7 @@ void mode_dancing_shadows(void)
     }
   }
 }
-static const char _data_FX_MODE_DANCING_SHADOWS[] PROGMEM = "Dancing Shadows@!,# of shadows;!;!";
+static const char _data_FX_MODE_DANCING_SHADOWS[] PROGMEM = "Dancing Shadows@!,# of shadows;;!";
 #endif // WLED_PS_DONT_REPLACE_1D_FX
 
 /*
@@ -4802,7 +4809,7 @@ void mode_tv_simulator(void) {
     SEGENV.aux0 = 0;
   }
 }
-static const char _data_FX_MODE_TV_SIMULATOR[] PROGMEM = "TV Simulator@!,!;;!;01";
+static const char _data_FX_MODE_TV_SIMULATOR[] PROGMEM = "TV Simulator@!,!;;;01";
 
 
 /*
@@ -5012,7 +5019,7 @@ void mode_ColorClouds()
     }
 
     uint32_t pixel;
-    if (SEGMENT.palette) { pixel = SEGMENT.color_from_palette(hue, false, true, 0, vol); }
+    if (SEGMENT.palette) { pixel = SEGMENT.color_from_palette(hue, false, true, 255, vol); } // 255: no color slot is replaced, Default shows a rainbow
     else { pixel = CRGBW(CHSV32(hue, 255, vol)); }
 
     // Suppress extremely dark pixels to avoid flickering of plain r/g/b.
@@ -5150,7 +5157,7 @@ void mode_shimmer() {
     }
   }
 }
-static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size,Granular,Flow,Zebra,Reverse,Sporadic;Fx,Bg,Cx;!;1;pal=15,sx=220,ix=10,c2=0,c3=0";
+static const char _data_FX_MODE_SHIMMER[] PROGMEM = "Shimmer@Speed,Interval,Size,Granular,Flow,Zebra,Reverse,Sporadic;Fx,Bg;!;1;pal=15,sx=220,ix=10,c2=0,c3=0";
 
 #ifndef WLED_DISABLE_2D
 ///////////////////////////////////////////////////////////////////////////////
@@ -5208,6 +5215,7 @@ static const char _data_FX_MODE_2DANALOGCLOCK[] PROGMEM = "Analog Clock 2D@,,,,,
 // Black hole
 void mode_2DBlackHole(void) {            // By: Stepko https://editor.soulmatelights.com/gallery/1012 , Modified by: Andrew Tuline
   if (!strip.isMatrix || !SEGMENT.is2D()) FX_FALLBACK_STATIC; // not a 2D set-up
+  SEGMENT.addPaletteColors(SEGMENT.check1); // the main color is used (and replaced by a palette) only with "Solid"
 
   const int cols = SEG_W;
   const int rows = SEG_H;
@@ -5232,7 +5240,7 @@ void mode_2DBlackHole(void) {            // By: Stepko https://editor.soulmateli
   // blur everything a bit
   if (SEGMENT.check3) SEGMENT.blur(16, cols*rows < 100);
 } // mode_2DBlackHole()
-static const char _data_FX_MODE_2DBLACKHOLE[] PROGMEM = "Black Hole@Fade rate,Outer Y freq.,Outer X freq.,Inner X freq.,Inner Y freq.,Solid,,Blur;!;!;2;pal=11";
+static const char _data_FX_MODE_2DBLACKHOLE[] PROGMEM = "Black Hole@Fade rate,Outer Y freq.,Outer X freq.,Inner X freq.,Inner Y freq.,Solid,,Blur;;!;2;pal=11";
 
 
 ////////////////////////////
@@ -5886,11 +5894,12 @@ void mode_2Dnoise(void) {                  // By Andrew Tuline
   const int rows = SEG_H;
 
   const unsigned scale  = SEGMENT.intensity+2;
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (int y = 0; y < rows; y++) {
     for (int x = 0; x < cols; x++) {
       uint8_t pixelHue8 = perlin8(x * scale, y * scale, strip.now / (16 - SEGMENT.speed/16));
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, pixelHue8));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, pixelHue8));
     }
   }
 } // mode_2Dnoise()
@@ -6109,6 +6118,7 @@ void mode_2Dtartan(void) {          // By: Elliott Kember  https://editor.soulma
   int offsetX = beatsin16_t(3, -360, 360);
   int offsetY = beatsin16_t(2, -360, 360);
   int sharpness = SEGMENT.custom3 / 8; // 0-3
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
 
   for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
@@ -6116,12 +6126,12 @@ void mode_2Dtartan(void) {          // By: Elliott Kember  https://editor.soulma
       intensity = bri = sin8_t(x * SEGMENT.speed/2 + offsetX);
       for (int i=0; i<sharpness; i++) intensity *= bri;
       intensity >>= 8*sharpness;
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, hue, intensity, LINEARBLEND));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, hue, intensity, LINEARBLEND));
       hue = y * 3 + offsetX;
       intensity = bri = sin8_t(y * SEGMENT.intensity/2 + offsetY);
       for (int i=0; i<sharpness; i++) intensity *= bri;
       intensity >>= 8*sharpness;
-      SEGMENT.addPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, hue, intensity, LINEARBLEND));
+      SEGMENT.addPixelColorXY(x, y, ColorFromPalette(pal, hue, intensity, LINEARBLEND));
     }
   }
 } // mode_2DTartan()
@@ -6580,6 +6590,7 @@ void mode_2Dscrollingtext(void) {
   // otherwise col2 == BLACK means use currently selected palette for gradient
   // if gradient is not selected set both colors the same
   if (SEGMENT.check1) { // use gradient
+    SEGMENT.addPaletteColors(0b100); // a palette replaces the gradient color
     if (SEGMENT.palette == 0) { // use colors for gradient
       col1 = SEGCOLOR(0);
       col2 = SEGCOLOR(2);
@@ -6762,7 +6773,7 @@ void mode_ripplepeak(void) {                // * Ripple peak. By Andrew Tuline.
     } // switch step
   } // for i
 } // mode_ripplepeak()
-static const char _data_FX_MODE_RIPPLEPEAK[] PROGMEM = "Ripple Peak@Fade rate,Max # of ripples,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0"; // Pixel, Beatsin
+static const char _data_FX_MODE_RIPPLEPEAK[] PROGMEM = "Ripple Peak@,Max # of ripples,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0"; // Pixel, Beatsin
 
 
 #ifndef WLED_DISABLE_2D
@@ -6800,7 +6811,7 @@ void mode_2DSwirl(void) {
   SEGMENT.addPixelColorXY( i,nj, ColorFromPalette(SEGPALETTE, (strip.now / 37 + volumeSmth*4), volumeRaw * SEGMENT.intensity / 64, LINEARBLEND)); //CHSV( ms / 37, 200, 255);
   SEGMENT.addPixelColorXY(ni, j, ColorFromPalette(SEGPALETTE, (strip.now / 41 + volumeSmth*4), volumeRaw * SEGMENT.intensity / 64, LINEARBLEND)); //CHSV( ms / 41, 200, 255);
 } // mode_2DSwirl()
-static const char _data_FX_MODE_2DSWIRL[] PROGMEM = "Swirl@!,Sensitivity,Blur;,Bg Swirl;!;2v;ix=64,si=0"; // Beatsin // TODO: color 1 unused?
+static const char _data_FX_MODE_2DSWIRL[] PROGMEM = "Swirl@!,Sensitivity,Blur;;!;2v;ix=64,si=0"; // Beatsin
 
 
 /////////////////////////
@@ -6835,7 +6846,7 @@ void mode_2DWaverly(void) {
   }
   if (SEGMENT.check3) SEGMENT.blur(16, cols*rows < 100);
 } // mode_2DWaverly()
-static const char _data_FX_MODE_2DWAVERLY[] PROGMEM = "Waverly@Amplification,Sensitivity,,,,,Blur;;!;2v;ix=64,si=0"; // Beatsin
+static const char _data_FX_MODE_2DWAVERLY[] PROGMEM = "Waverly@Amplification,Sensitivity,,,,,,Blur;;!;2v;ix=64,si=0"; // Beatsin
 
 #endif // WLED_DISABLE_2D
 
@@ -8022,6 +8033,7 @@ void mode_2Doctopus() {
   }
 
   SEGENV.step += SEGMENT.speed / 32 + 1;  // 1-4 range
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
   for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
       byte angle = rMap[XY(x,y)].angle;
@@ -8029,11 +8041,11 @@ void mode_2Doctopus() {
       //CRGB c = CHSV(SEGENV.step / 2 - radius, 255, sin8_t(sin8_t((angle * 4 - radius) / 4 + SEGENV.step) + radius - SEGENV.step * 2 + angle * (SEGMENT.custom3/3+1)));
       unsigned intensity = sin8_t(sin8_t((angle * 4 - radius) / 4 + SEGENV.step/2) + radius - SEGENV.step + angle * (SEGMENT.custom3/4+1));
       //intensity = map((intensity*intensity) & 0xFFFF, 0, 65535, 0, 255); // add a bit of non-linearity for cleaner display -> no longer needed with proper gamma correction
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, SEGENV.step / 2 - radius, intensity));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, SEGENV.step / 2 - radius, intensity));
     }
   }
 }
-static const char _data_FX_MODE_2DOCTOPUS[] PROGMEM = "Octopus@!,,Offset X,Offset Y,Legs,fasttan;;!;2;";
+static const char _data_FX_MODE_2DOCTOPUS[] PROGMEM = "Octopus@!,,Offset X,Offset Y,Legs;;!;2;";
 
 
 //Waving Cell
@@ -8049,11 +8061,12 @@ void mode_2Dwavingcell() {
   uint32_t aX = SEGMENT.custom1/16 + 9;
   uint32_t aY = SEGMENT.custom2/16 + 1;
   uint32_t aZ = SEGMENT.custom3 + 1;
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per pixel
    for (int x = 0; x < cols; x++) {
     for (int y = 0; y < rows; y++) {
       uint32_t wave = sin8_t((x * aX) + sin8_t((((y<<8) + t) * aY)>>8)) + cos8_t(y * aZ); // bit shifts to increase temporal resolution
       uint8_t colorIndex = wave + (t>>(8-(SEGMENT.check2*3)));
-      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(SEGPALETTE, colorIndex));
+      SEGMENT.setPixelColorXY(x, y, ColorFromPalette(pal, colorIndex));
     }
   }
   SEGMENT.blur(SEGMENT.intensity);
