@@ -3,6 +3,18 @@
 Notes for this fork (TRusselo/WLED) on the web UI redesign. They are not meant for a pull request to wled/WLED.
 Written with AI assistance (Claude Code) and reviewed by the fork owner.
 
+There are currently 2 varients:
+one that has the palette picker as a popup (ui-redesign), and one that keeps it shown as a card when viable requiring 1 less click. (ui-redesign-palette-picker)
+
+## Purpose
+- Purposeful inconsistency between effects, and UI presenting options that cannot be changed with other current settings makes the UI feel confusing at times and like "you just click shit until its good enough".
+- Claude's diagnosis found 4 main reasons:
+
+1. **Choosing an effect on page 2 can replace your selected palette on page 1.** `setFX()` sends `fxdef: true` by default (`wled00/data/index.js:35`, `:2451`). When an effect has a palette default, the firmware then calls `setPalette()` (`wled00/FX_fcn.cpp:633-634`). 59 of the 216 effects in `FX.cpp` have one. So you pick a palette on page 1, pick an effect on page 2, and your palette is gone.
+2. **Your color choice is often ignored without any warning.** Palette colors are applied to different layers for each effect, could be Bg, Fg, or Fx ). Effects that read colors through `color_from_palette()` only use your color slots when the palette is "Default" (`FX_fcn.cpp:1188-1191`). With any other palette, those effects use the palette instead, but the color picker still looks active. 
+3. **"Default" palette means something different for each effect.** It switches to whatever palette that effect declares, or Party colors if it declares none (`FX_fcn.cpp:232`, `:635-636`). Default palette, could be an existing palette, individual colours, gradient, ect, or not set at all.
+4. **The colors page depends on a choice made on the next page.** The effect decides which color slots appear and what they're called (`index.js:1684-1714`). The generic labels are "Fx", "Bg", "Cs" (`index.js:1698-1700`), and effects that define their own names get cut to 2 letters with a legend underneath (`:1691-1695`).
+
 ## Goal
 
 Choosing a look (effect, colors, palette) should be clear and truthful:
