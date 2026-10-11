@@ -929,6 +929,8 @@ static void mode_ants(void) {
   // Clear background if not in Smear mode
   if (!SmearMode) SEGMENT.fill(backgroundColor);
 
+  SEGMENT.addPaletteColors(0b101); // a palette replaces the ant colors (main and third color)
+
   // Update and render each ant
   for (int i = 0; i < numAnts; i++) {
     float timeSinceLastUpdate = float(int(strip.now - ants[i].lastBumpUpdate)) / timeConversionFactor;
@@ -1366,7 +1368,7 @@ static void mode_dissolveplus(void) {
             uint32_t c;
             if (SEGMENT.check1) {
               uint8_t pId = SEGMENT.palette;
-              c = (pId == 0) ? SEGMENT.color_wheel(hw_random8()) : SEGMENT.color_from_palette(hw_random16(SEGLEN), true, PALETTE_SOLID_WRAP, 0);
+              c = (pId == 0) ? SEGMENT.color_wheel(hw_random8()) : SEGMENT.color_from_palette(hw_random16(SEGLEN), true, PALETTE_SOLID_WRAP, 255); // 255: random colors replace no color slot
               if (c == SEGCOLOR(1)) c ^= 0x00000001;  // flip the last bit to make sure it is slightly different than the background color
               pixels[i] = c;
             } else {
@@ -1397,7 +1399,7 @@ static void mode_dissolveplus(void) {
       uint32_t c;
       if (SEGMENT.check1) {
         uint8_t pId = SEGMENT.palette;
-        c = (pId == 0) ? SEGMENT.color_wheel(hw_random8()) : SEGMENT.color_from_palette(hw_random16(SEGLEN), true, PALETTE_SOLID_WRAP, 0);
+        c = (pId == 0) ? SEGMENT.color_wheel(hw_random8()) : SEGMENT.color_from_palette(hw_random16(SEGLEN), true, PALETTE_SOLID_WRAP, 255); // 255: random colors replace no color slot
       } else {
         c = SEGMENT.color_from_palette(SEGENV.aux1, true, PALETTE_SOLID_WRAP, 0);
       }

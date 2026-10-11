@@ -588,6 +588,7 @@ void ParticleSystem2D::render() {
   }
 
   // go over particles and render them to the buffer
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per particle
   for (uint32_t i = 0; i < usedParticles; i++) {
     if (particles[i].ttl == 0 || particleFlags[i].outofbounds)
       continue;
@@ -595,11 +596,11 @@ void ParticleSystem2D::render() {
     if (fireIntesity) { // fire mode
       brightness = (uint32_t)particles[i].ttl * (3 + (fireIntesity >> 5)) + 5;
       brightness = min(brightness, (uint32_t)255);
-      baseRGB = ColorFromPalette(SEGPALETTE, brightness, 255, LINEARBLEND_NOWRAP);
+      baseRGB = ColorFromPalette(pal, brightness, 255, LINEARBLEND_NOWRAP);
     }
     else {
       brightness = min((particles[i].ttl << 1), (int)255);
-      baseRGB = ColorFromPalette(SEGPALETTE, particles[i].hue, 255, blend);
+      baseRGB = ColorFromPalette(pal, particles[i].hue, 255, blend);
       if (particles[i].sat < 255) {
         CHSV32 baseHSV = baseRGB;
         baseHSV.s = min(baseHSV.s, particles[i].sat); // set the saturation but don't increase it
@@ -1449,13 +1450,14 @@ void ParticleSystem1D::render() {
   }
 
   // go over particles and render them to the buffer
+  const CRGBPalette16 &pal = SEGPALETTE; // looked up once instead of per particle
   for (uint32_t i = 0; i < usedParticles; i++) {
     if ( particles[i].ttl == 0 || particleFlags[i].outofbounds)
       continue;
 
     // generate RGB values for particle
     brightness = min(particles[i].ttl << 1, (int)255);
-    baseRGB = ColorFromPalette(SEGPALETTE, particles[i].hue, 255, blend);
+    baseRGB = ColorFromPalette(pal, particles[i].hue, 255, blend);
     if (advPartProps != nullptr) { //saturation is advanced property in 1D system
       if (advPartProps[i].sat < 255) {
         CHSV32 baseHSV = baseRGB;

@@ -27,7 +27,6 @@
 				"quick": "Quick color selectors",
 				"hex": "HEX color input"
 				},
-			"pcmbot": "Show bottom tab bar in PC mode",
 			"pid": "Show preset IDs",
 			"seglen": "Set segment length instead of stop LED",
 			"segpwr": "Hide segment power &amp; brightness",
@@ -126,6 +125,7 @@
 		if (!sett) gId('lserr').style.display = "inline";
 		try {
 			sett = JSON.parse(sett);
+			if (sett && sett.comp) delete sett.comp.pcmbot; // removed with PC mode
 		} catch (e) {
 			sett = {};
 			gId('lserr').style.display = "inline";
@@ -229,7 +229,7 @@
 	<h2>User Interface</h2>
 	<div class="sec">
 		Device Name: <input type="text" name="DS" maxlength="32"><br>
-		Enable simplified UI: <input type="checkbox" name="SU"><br>
+		Enable simplified UI (single column on all screens): <input type="checkbox" name="SU"><br>
 	</div>
   <div class="sec">
 		<i>The following UI customization settings are unique both to the WLED device and this browser.<br>
@@ -241,7 +241,6 @@
 		<h3>UI Appearance</h3>
 		<span class="l"></span>: <input type="checkbox" id="comp_labels" class="agi cb"><br>
 		<span class="l"></span>: <input type="checkbox" id="comp_idsort" class="agi cb"><br>
-		<span class="l"></span>: <input type="checkbox" id="comp_pcmbot" class="agi cb"><br>
 		<span class="l"></span>: <input type="checkbox" id="comp_pid" class="agi cb"><br>
 		<span class="l"></span>: <input type="checkbox" id="comp_seglen" class="agi cb"><br>
 		<span class="l"></span>: <input type="checkbox" id="comp_segpwr" class="agi cb"><br>
