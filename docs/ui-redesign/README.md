@@ -41,12 +41,6 @@ Choosing a look (effect, colors, palette) should be clear and truthful:
 - [betas.md](betas.md): beta pre-releases, the A/B variants, installing a beta.
 - [testing.md](testing.md): what was tested, how, and what was not; sizes.
 
-## Status (2026-10-05)
-
-- PR #1 is open, CI green. Variant A and B betas are published.
-- Variant B runs on the owner's QuinLED Dig-Uno v3 (ESP32). The firmware part (`pcol` learning) was checked on it through the JSON API, see [testing.md](testing.md).
-- Open: choose A or B; decide whether to win back the remaining 270 bytes of page size (see below); user documentation in WLED-Docs format if ever needed.
-
 ## Size compared with upstream
 
 Upstream here means `main` of this fork at 6720ce4 (wled/WLED `main` at the fork point). Numbers from the CI build logs.
