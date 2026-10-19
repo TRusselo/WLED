@@ -25,17 +25,16 @@ Choosing a look (effect, colors, palette) should be clear and truthful:
 
 | What | Where |
 |---|---|
-| Redesign, variant A (palette button with popup list) | branch `ui-redesign`, [PR #1](https://github.com/TRusselo/WLED/pull/1) into `main` |
-| Variant B (palette list as a card in place of the color picker) | branch `ui-redesign-palette-card` (A plus one commit) |
-| Beta builds | pre-releases [`beta-ui-redesign`](https://github.com/TRusselo/WLED/releases/tag/beta-ui-redesign) and [`beta-ui-redesign-palette-card`](https://github.com/TRusselo/WLED/releases/tag/beta-ui-redesign-palette-card) |
-| Beta workflow | `.github/workflows/beta.yml` (fork only), see [betas.md](betas.md) |
+| Redesign (palette list as a card in place of the color picker) | `main`; the earlier popup variant is in its history ([PR #1](https://github.com/TRusselo/WLED/pull/1), closed) |
+| Nightly build | pre-release [`nightly`](https://github.com/TRusselo/WLED/releases/tag/nightly), rebuilt after each daily upstream sync |
+| Release | [latest release](https://github.com/TRusselo/WLED/releases/latest), tagged `v<version>-ui` |
+| Workflows (fork only) | `.github/workflows/beta.yml` (nightly), `release-fork.yml` (release), `sync-upstream.yml` (daily sync) |
 
 ## Notes in this folder
 
 - [user-guide.md](user-guide.md): how the new UI works, for users.
 - [effect-authors.md](effect-authors.md): what effect code and metadata need so the UI shows the right controls.
 - [json-api.md](json-api.md): the read-only segment field `pcol`.
-- [betas.md](betas.md): beta pre-releases, the A/B variants, installing a beta.
 - [testing.md](testing.md): what was tested, how, and what was not; sizes.
 
 ## Size compared with upstream

@@ -2,7 +2,7 @@
 name: Sync with upstream
 
 # For forks: merges wled/WLED main into this repository's main (like the "Sync fork" button on GitHub),
-# then builds the result and publishes it as the rolling pre-release "beta-main" (Deploy Beta workflow).
+# then builds the result and publishes it as the rolling pre-release "nightly" (Deploy Nightly workflow, beta.yml).
 # Runs once a day and from the Actions tab ("Run workflow"); does nothing when upstream has no new commits.
 # A merge conflict fails this workflow; resolve it by hand (Sync fork on GitHub, or a local merge).
 # Upstream changes to files in .github/workflows can only be merged with a token that has the "workflows"
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write # merge into main
-      actions: write  # start the Deploy Beta workflow
+      actions: write  # start the Deploy Nightly workflow
     steps:
       - name: Merge wled/WLED main into main
         id: merge
@@ -40,7 +40,7 @@ jobs:
           fi
           echo "$out"
           echo "type=$(jq -r '.merge_type' <<< "$out")" >> "$GITHUB_OUTPUT"
-      - name: Build and publish beta-main
+      - name: Build and publish nightly
         if: steps.merge.outputs.type != 'none'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
