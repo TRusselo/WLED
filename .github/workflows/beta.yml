@@ -66,7 +66,8 @@ jobs:
             "" \
             "For testing only: not reviewed and not an official WLED release. Each run of the \"Deploy Nightly\" workflow replaces this pre-release." \
             "" \
-            "To install, download the .bin file for your board (for example \`ESP32\` for most ESP32 boards) and upload it on the device's update page." \
+            "Devices running firmware from this repository are only offered full releases on their update page (\"Auto update\"), never this pre-release." \
+            "To install it, download the .bin file for your board (for example \`ESP32\` for most ESP32 boards) and upload it on the device's update page." \
             > notes.md
           # delete the previous pre-release and its tag (the tag then moves to the new commit)
           gh release delete "$TAG" --repo "$REPO" --cleanup-tag --yes || echo "No previous release $TAG"
