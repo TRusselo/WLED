@@ -3,9 +3,6 @@
 Notes for this fork (TRusselo/WLED) on the web UI redesign. They are not meant for a pull request to wled/WLED.
 Written with AI assistance (Claude Code) and reviewed by the fork owner.
 
-There are currently 2 varients:
-one that has the palette picker as a popup (ui-redesign), and one that keeps it shown as a card when viable requiring 1 less click. (ui-redesign-palette-picker)
-
 ## Purpose
 - Purposeful inconsistency between effects, and UI presenting options that cannot be changed with other current settings makes the UI feel confusing at times and like "you just click shit until its good enough".
 - Claude's diagnosis found 4 main reasons:
