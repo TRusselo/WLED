@@ -3,9 +3,6 @@
 Notes for this fork (TRusselo/WLED) on the web UI redesign. They are not meant for a pull request to wled/WLED.
 Written with AI assistance (Claude Code) and reviewed by the fork owner.
 
-There are currently 2 varients:
-one that has the palette picker as a popup (ui-redesign), and one that keeps it shown as a card when viable requiring 1 less click. (ui-redesign-palette-picker)
-
 ## Purpose
 - Purposeful inconsistency between effects, and UI presenting options that cannot be changed with other current settings makes the UI feel confusing at times and like "you just click shit until its good enough".
 - Claude's diagnosis found 4 main reasons:
@@ -40,12 +37,6 @@ Choosing a look (effect, colors, palette) should be clear and truthful:
 - [json-api.md](json-api.md): the read-only segment field `pcol`.
 - [betas.md](betas.md): beta pre-releases, the A/B variants, installing a beta.
 - [testing.md](testing.md): what was tested, how, and what was not; sizes.
-
-## Status (2026-10-05)
-
-- PR #1 is open, CI green. Variant A and B betas are published.
-- Variant B runs on the owner's QuinLED Dig-Uno v3 (ESP32). The firmware part (`pcol` learning) was checked on it through the JSON API, see [testing.md](testing.md).
-- Open: choose A or B; decide whether to win back the remaining 270 bytes of page size (see below); user documentation in WLED-Docs format if ever needed.
 
 ## Size compared with upstream
 
